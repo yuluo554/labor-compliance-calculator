@@ -38,7 +38,9 @@
 - CLI 冒烟：`params` exit 0；`doctor` exit 0；`calc examples/sample-case.json` **exit 2**（门控拦截，预期）；`calc --preview` **exit 1**（引擎待 M2，预期）。
 - 打包元数据：`python -m build code` 成功，wheel 元数据已验（Name/Version/License/Requires-Python/四个 extras 齐全，long_description 1557 字符）。
 - **导出树干净环境验证**（`git archive HEAD | tar -x` + 全新 venv，等价于 clone）：**79 passed + 1 skipped**（PySide6 缺依赖的声明式跳过），收集数 80 与 dev 一致；门禁全过；无 `.git` 时 history 模式**大声失败 exit 2**（而非静默 0 命中）。
-- **提交元数据邮箱已改写**：原个人邮箱 → `<id>+<user>@users.noreply.github.com`（`filter-branch --env-filter` + reflog expire + gc）；三个提交的 `%ae`/`%ce` 均为 noreply，全历史 grep 旧值 = 0，`git fsck` 0 错误。**改写发生在建仓之前（零成本窗口，无 force-push）**。备份 bundle 在仓库外 `../lcc-backup-pre-m0.bundle`（验证完成后可删）。
+- **提交元数据邮箱已改写**：原个人邮箱 → `<id>+<user>@users.noreply.github.com`（`filter-branch --env-filter` + reflog expire + gc）；**全部提交**的 `%ae`/`%ce` 均为 noreply，全历史 grep 旧值 = 0，`git fsck` 0 错误。**改写发生在建仓之前（零成本窗口，无 force-push）**。
+- **留档自命中已修**：本 HANDOFF 早期版本在"改写记录"里复述了旧邮箱字面值，使其随提交进入历史（HEAD 已干净但旧 blob 仍命中）→ 已用 `--tree-filter` 占位化并重跑 reflog/gc。**教训：留档文档一律用指代，不复述敏感字面值**。
+- 备份 bundle 在仓库外 `../lcc-backup-pre-m0.bundle`（验证完成后可删）。
 
 **M0 收尾发现并修复的三处真实缺陷（全部由守门测试/干净环境抓出，非人工目检）**：
 1. `code/pyproject.toml` 的 `readme = "README.md"` 相对 `code/` 解析，指向不存在的文件 → sdist 告警 "README.md cannot be found"。已新增 `code/README.md`（指向仓库根说明）。
