@@ -52,7 +52,12 @@ $ py -X utf8 tools/bench.py
 
 ### 1.5 CI
 
-- M3 提交推送 `origin/main` 后须**复核 CI 三矩阵全绿**（ubuntu/py3.12 + windows/py3.12 + windows/py3.8），CLI smoke 步骤已新增 `python -m lcc calc examples/sample-case.json`（默认四模块）。
+- M3 提交 `17a8d4e` 推送 `origin/main` → **CI 全绿**（run `38396484553`）：三矩阵
+  `ubuntu-latest/py3.12` + `windows-latest/py3.12` + `windows-latest/py3.8` 全部 ✓。
+  workflow 步骤：Repo gates（literals / frozen rulesets / frozen truth / dessensitize）、
+  **Benchmarks (B1/B2/B3)**、Run tests、CLI smoke（含 `python -m lcc calc examples/sample-case.json`
+  默认四模块）各步均 ✓。
+- 说明：CI 日志仍有 Node.js 20 弃用提示与 ubuntu 镜像迁移预告（actions 版本层面，非本项目失败）。
 - push 事件数 = run 数（`git rev-list --count` 数的是提交数，勿混用）。
 
 ---
