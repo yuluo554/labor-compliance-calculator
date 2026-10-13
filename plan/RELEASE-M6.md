@@ -83,13 +83,14 @@
 
 | 项 | 值 |
 |---|---|
-| push 事件触发 run 数 | **16** |
+| push 事件触发 run 数 | **17** |
 | 非 push 事件 run 数 | 0（`gh run list --json event` 唯一值 = `push`） |
 | 发布准备提交 | `167fe38` → run `38425953290`：三矩阵 **全 ✓ 225 passed** |
 | 新增步骤实测 | `release_assets.py selftest` → `RELEASE_ASSETS_SELFTEST_OK`；`dessensitize --mode messages`/`--mode history` → 两模式 `DESSENSITIZE_AUDIT_OK`（依赖 `fetch-depth: 0`） |
 | **首推终态提交失败并修复** | `edd9fcd` → run `38427285439` **三矩阵全红**：脱敏门抓到 `RELEASE-M6.md` 自身复述了字面路径形态（HARD `user_home_path`）→ 改为占位符表述，`--amend`（显式带 `GIT_COMMITTER_EMAIL`，防 committer 回落旧值）+ `--force-with-lease` 推送 |
 | 修复后终态提交 | `47415dc` → run `38427732093`（main，三矩阵 **全 ✓**） |
 | **tag 触发的那轮** | `v0.1.0` tag push → run `38428190360`（`head_branch=v0.1.0`，**success**）；`ci.yml` 配了 `tags: ["v*"]`，故 tag push 单独触发一轮 |
+| 结果回写提交 | `265c41e` → run `38428824426`（main，**success**） |
 | 测试数（CI 实测） | windows/3.12、windows/3.8、ubuntu/3.12 均 **225 passed** |
 
 > 说明：最早 7 个提交随"建仓首推"一次到达，只在其 tip 产生 1 个 run（D-36 已留档）；
@@ -148,10 +149,21 @@
 |---|---|---|
 | 1 | tag 触发 CI run | `38428190360`（`head_branch=v0.1.0`）**success** |
 | 2 | 终态提交 CI run | `38427732093`（main）**success**，三矩阵全 ✓ |
-| 3 | push 数 = run 数 | 16 push 事件 = 16 run（含 1 个失败后被 force-push 替换的 run，如实留档） |
+| 3 | push 数 = run 数 | 17 push 事件 = 17 run（含 1 个失败后被 force-push 替换的 run，如实留档） |
 | 4 | 下载件 sha256 | 与台账逐位一致（见 §六） |
 | 5 | 中立目录自检 | `PACKAGE_VERIFY_OK`（对象为下载件解压目录） |
 | 6 | topics 回读 | 10 个全部生效 |
+
+### 八.1 发布后复核（GitHub 全新 clone = 远端最终提交）
+
+| 项 | 结果 |
+|---|---|
+| clone head | `265c41e`（= 远端 `main` 最终提交） |
+| README 逐字跑通（`[dev]`） | `python -m lcc params`/`doctor` exit 0；`pytest` **220 passed + 5 skipped** |
+| README 逐字跑通（`[dev,gui,report]` + offscreen） | `pytest` **225 passed**；`calc` 四模块 exit 0、`--preview` exit 1、`report` md/xlsx 均 exit 0 |
+| 历史三扫（对远端最终提交） | tracked/messages/history 三模式 `DESSENSITIZE_AUDIT_OK`（0 硬门） |
+| 门禁 + 基准 | 零政策字面量 OK / 冻结规则包 OK / 冻结真值 OK / `selftest` OK / 基准**全部达标** |
+| 仓库跟踪面 | 104 个跟踪文件；无 `dist/`/`build/`/`.venv`/scratch 类文件被跟踪 |
 
 ---
 
