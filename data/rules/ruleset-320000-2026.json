@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "region_code": "320000",
+  "region_name": "江苏省",
+  "year": 2026,
+  "generated_by": "tools/gen_rulesets.py",
+  "status": "pending",
+  "note": "骨架：数值与来源待 M1 逐条核对官方发布后填入并置 status=verified；禁手改，改动走生成器重生成。",
+  "params": {
+    "social_avg_wage_monthly": {
+      "value": "0.00",
+      "unit": "CNY/month",
+      "caliber": "pending_caliber_registration",
+      "basis_year": 2025,
+      "status": "pending",
+      "source": {
+        "publisher": null,
+        "published_year": null,
+        "doc_no": null,
+        "url": null,
+        "retrieved_at": null
+      },
+      "note": "上年度职工月平均工资（三倍封顶基数）；口径须与 regions.json 登记一致。"
+    },
+    "min_wage_monthly": {
+      "value": "0.00",
+      "unit": "CNY/month",
+      "status": "pending",
+      "source": {
+        "publisher": null,
+        "published_year": null,
+        "doc_no": null,
+        "url": null,
+        "retrieved_at": null
+      },
+      "note": "当地月最低工资标准（月工资下限用）。"
+    },
+    "holiday_calendar": {
+      "days": [],
+      "adjusted_workdays": [],
+      "status": "pending",
+      "source": {
+        "publisher": "国务院办公厅",
+        "published_year": null,
+        "doc_no": null,
+        "url": null,
+        "retrieved_at": null
+      },
+      "note": "法定节假日（days）与调休上班日（adjusted_workdays），格式 YYYY-MM-DD。"
+    }
+  }
+}

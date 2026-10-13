@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "labor-compliance-calculator"
+version = "0.1.0"
+description = "劳动用工合规计算引擎：经济补偿/赔偿金、加班费、未休年休假折算、未签劳动合同二倍工资 + 地区×年度参数库（全本地、零上传）"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "yuluo554" }]
+keywords = ["labor-law", "compliance", "calculator", "severance", "overtime", "annual-leave"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Legal Industry",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Office/Business :: Financial",
+]
+
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7,<9", "pyyaml>=6"]
+gui = ["PySide6>=6.5,<6.7"]
+report = ["openpyxl>=3.0"]
+build = ["pyinstaller>=5.13,<7"]
+
+[project.scripts]
+lcc = "lcc.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/yuluo554/labor-compliance-calculator"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

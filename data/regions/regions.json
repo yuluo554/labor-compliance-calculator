@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "note": "地区主数据：行政区划码 + 社平工资口径登记（口径为必填，禁止跨地区套用；见 plan/01 §五 口径警示）。全部地区初始化 status=pending，M1 逐地区核对官方发布后置 verified。",
+  "regions": [
+    {
+      "code": "110000",
+      "name": "北京市",
+      "level": "province",
+      "parent": null,
+      "avg_wage_caliber": "pending_caliber_registration",
+      "caliber_note": "口径待核对：需确认北京市用于劳动合同法第 47 条封顶的社平工资口径（全口径城镇单位就业人员平均工资 / 城镇非私营在岗职工平均工资）",
+      "status": "pending",
+      "source": { "publisher": null, "published_year": null, "url": null, "retrieved_at": null }
+    },
+    {
+      "code": "310000",
+      "name": "上海市",
+      "level": "province",
+      "parent": null,
+      "avg_wage_caliber": "pending_caliber_registration",
+      "caliber_note": "口径待核对：需确认上海市用于劳动合同法第 47 条封顶的社平工资口径",
+      "status": "pending",
+      "source": { "publisher": null, "published_year": null, "url": null, "retrieved_at": null }
+    },
+    {
+      "code": "440000",
+      "name": "广东省",
+      "level": "province",
+      "parent": null,
+      "avg_wage_caliber": "pending_caliber_registration",
+      "caliber_note": "口径待核对：广东省内各地市社平工资可能分别发布，需确认省级口径与地市口径的适用关系",
+      "status": "pending",
+      "source": { "publisher": null, "published_year": null, "url": null, "retrieved_at": null }
+    },
+    {
+      "code": "320000",
+      "name": "江苏省",
+      "level": "province",
+      "parent": null,
+      "avg_wage_caliber": "pending_caliber_registration",
+      "caliber_note": "口径待核对：需确认江苏省用于劳动合同法第 47 条封顶的社平工资口径",
+      "status": "pending",
+      "source": { "publisher": null, "published_year": null, "url": null, "retrieved_at": null }
+    }
+  ]
+}

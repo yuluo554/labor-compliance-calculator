@@ -1,0 +1,29 @@
+{
+  "case_id": "sample-001",
+  "note": "示例输入：上海地区 2026 年度，协商一致解除。M0 阶段参数包 status=pending → 门控拦截（预期退出码 2）；--preview 可查看参数元信息但不输出金额。",
+  "input_facts": {
+    "employment": {
+      "region_code": "310000",
+      "year": 2026,
+      "hire_date": "2020-03-01",
+      "terminate_date": "2026-06-30",
+      "monthly_wages": [
+        "12000.00", "12500.00", "12000.00", "11800.00",
+        "13000.00", "12000.00", "12000.00", "12200.00",
+        "12000.00", "12100.00", "12000.00", "12300.00"
+      ],
+      "work_system": "standard",
+      "cumulative_service_years": "6.5",
+      "contract_signed": true,
+      "annual_leave_taken_days": "2",
+      "overtime": [
+        { "date": "2026-05-01", "hours": "8" },
+        { "date": "2026-05-10", "hours": "4" }
+      ]
+    },
+    "termination": {
+      "ground": "mutual_agreement",
+      "notified_30d_in_advance": null
+    }
+  }
+}

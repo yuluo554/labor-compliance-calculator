@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "note": "全国法定常数包：跨地区不变量（倍率/天数分档/口径天数）。全部条目在 M1 逐条核对官方原文后由 pending 置为 verified（见 plan/05 M1-2）。未核对条目不进入计算路径（lcc.gate 单点门控）。",
+  "constants": {
+    "severance": {
+      "cap_multiple_of_social_avg": {
+        "value": 3,
+        "unit": "倍",
+        "basis": ["LCL-47"],
+        "status": "pending",
+        "source": {
+          "channel": "npc.gov.cn",
+          "note": "《劳动合同法》第四十七条：月工资高于本地区上年度职工月平均工资三倍的，按三倍数额支付"
+        }
+      },
+      "cap_years": {
+        "value": 12,
+        "unit": "年",
+        "basis": ["LCL-47"],
+        "status": "pending",
+        "source": {
+          "channel": "npc.gov.cn",
+          "note": "《劳动合同法》第四十七条：支付年限最高不超过十二年（仅适用封顶情形）"
+        }
+      },
+      "rounding": {
+        "full_year_threshold_months": {
+          "value": 6,
+          "unit": "月",
+          "basis": ["LCL-47"],
+          "status": "pending",
+          "source": {
+            "channel": "npc.gov.cn",
+            "note": "《劳动合同法》第四十七条：六个月以上不满一年的，按一年计算"
+          }
+        },
+        "round_up_to_year": {
+          "value": 1,
+          "unit": "年",
+          "basis": ["LCL-47"],
+          "status": "pending",
+          "source": {
+            "channel": "npc.gov.cn",
+            "note": "满六个月不满一年 → 按一年计"
+          }
+        },
+        "round_down_to_half_month": {
+          "value": 0.5,
+          "unit": "月工资",
+          "basis": ["LCL-47"],
+          "status": "pending",
+          "source": {
+            "channel": "npc.gov.cn",
+            "note": "不满六个月的，向劳动者支付半个月工资的经济补偿"
+          }
+        }
+      },
+      "avg_wage_months": {
+        "value": 12,
+        "unit": "月",
+        "basis": ["LCL-47"],
+        "status": "pending",
+        "source": {
+          "channel": "npc.gov.cn",
+          "note": "月工资指劳动者在劳动合同解除或终止前十二个月的平均工资"
+        }
+      }
+    },
+    "overtime": {
+      "rates": {
+        "workday_extension": {
+          "value": 1.5,
+          "unit": "倍工资",
+          "basis": ["LL-44"],
+          "status": "pending",
+          "source": {
+            "channel": "npc.gov.cn",
+            "note": "《劳动法》第四十四条：安排延长工作时间的，支付不低于工资的百分之一百五十"
+          }
+        },
+        "rest_day_no_compensatory": {
+          "value": 2.0,
+          "unit": "倍工资",
+          "basis": ["LL-44"],
+          "status": "pending",
+          "source": {
+            "channel": "npc.gov.cn",
+            "note": "《劳动法》第四十四条：休息日安排工作又不能安排补休的，支付不低于百分之二百"
+          }
+        },
+        "statutory_holiday": {
+          "value": 3.0,
+          "unit": "倍工资",
+          "basis": ["LL-44"],
+          "status": "pending",
+          "source": {
+            "channel": "npc.gov.cn",
+            "note": "《劳动法》第四十四条：法定休假日安排工作的，支付不低于百分之三百"
+          }
+        }
+      }
+    },
+    "annual_leave": {
+      "monthly_pay_days": {
+        "value": "21.75",
+        "unit": "天/月",
+        "basis": ["MOHRSS-ORDER-1-ART11"],
+        "status": "pending",
+        "source": {
+          "channel": "gov.cn",
+          "note": "《企业职工带薪年休假实施办法》第十一条：日工资收入按月工资除以月计薪天数（21.75 天）折算"
+        }
+      },
+      "entitlement_tiers": [
+        {
+          "min_service_years": 1,
+          "max_service_years_exclusive": 10,
+          "days": 5,
+          "basis": ["ALR-3"],
+          "status": "pending",
+          "source": {
+            "channel": "gov.cn",
+            "note": "《职工带薪年休假条例》第三条：累计工作已满 1 年不满 10 年的，年休假 5 天"
+          }
+        },
+        {
+          "min_service_years": 10,
+          "max_service_years_exclusive": 20,
+          "days": 10,
+          "basis": ["ALR-3"],
+          "status": "pending",
+          "source": {
+            "channel": "gov.cn",
+            "note": "《职工带薪年休假条例》第三条：已满 10 年不满 20 年的，年休假 10 天"
+          }
+        },
+        {
+          "min_service_years": 20,
+          "max_service_years_exclusive": null,
+          "days": 15,
+          "basis": ["ALR-3"],
+          "status": "pending",
+          "source": {
+            "channel": "gov.cn",
+            "note": "《职工带薪年休假条例》第三条：已满 20 年的，年休假 15 天"
+          }
+        }
+      ],
+      "unused_multiple": {
+        "value": 3.0,
+        "unit": "倍日工资",
+        "basis": ["ALR-5", "MOHRSS-ORDER-1-ART10"],
+        "status": "pending",
+        "source": {
+          "channel": "gov.cn",
+          "note": "《职工带薪年休假条例》第五条第三款 + 《实施办法》第十条：未安排年休假的按日工资收入的 300% 支付"
+        }
+      },
+      "already_paid_portion": {
+        "value": 1.0,
+        "unit": "倍日工资",
+        "basis": ["MOHRSS-ORDER-1-ART10"],
+        "status": "pending",
+        "source": {
+          "channel": "gov.cn",
+          "note": "《实施办法》第十条：300% 中已包含用人单位支付正常工作期间的工资收入 → 实际另付 200%"
+        }
+      },
+      "days_per_year": {
+        "value": 365,
+        "unit": "天",
+        "basis": ["MOHRSS-ORDER-1-ART12"],
+        "status": "pending",
+        "source": {
+          "channel": "gov.cn",
+          "note": "《实施办法》第十二条：当年度折算＝（当年度在本单位已过日历天数÷365）×全年应休天数"
+        }
+      }
+    },
+    "double_wage": {
+      "start_after_months": {
+        "value": 1,
+        "unit": "月",
+        "basis": ["LCL-82"],
+        "status": "pending",
+        "source": {
+          "channel": "npc.gov.cn",
+          "note": "《劳动合同法》第八十二条：自用工之日起超过一个月不满一年未订立书面劳动合同的，支付二倍工资"
+        }
+      },
+      "max_months": {
+        "value": 11,
+        "unit": "月",
+        "basis": ["LCL-82"],
+        "status": "pending",
+        "source": {
+          "channel": "npc.gov.cn",
+          "note": "《劳动合同法》第八十二条：二倍工资差额最长计算至满一年前一日（即最长 11 个月）"
+        }
+      }
+    }
+  }
+}
