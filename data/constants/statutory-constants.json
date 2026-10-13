@@ -1,26 +1,56 @@
 {
   "schema_version": 1,
-  "note": "全国法定常数包：跨地区不变量（倍率/天数分档/口径天数）。全部条目在 M1 逐条核对官方原文后由 pending 置为 verified（见 plan/05 M1-2）。未核对条目不进入计算路径（lcc.gate 单点门控）。",
+  "note": "全国法定常数包：跨地区不变量（倍率/天数分档/口径天数）。全部条目已于 M1 逐条核对官方原文并置 verified（见 data/README.md 台账与 data/sources/ 核对记录）。未核对条目不进入计算路径（lcc.gate 单点门控）。",
+  "sources": {
+    "LCL": {
+      "channel": "samr.gov.cn",
+      "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+      "title": "中华人民共和国劳动合同法（全文）",
+      "retrieved_at": "2026-10-13"
+    },
+    "LL": {
+      "channel": "samr.gov.cn",
+      "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_d9aa750028b14b99a776cb93726a360d.html",
+      "title": "中华人民共和国劳动法（全文）",
+      "retrieved_at": "2026-10-13"
+    },
+    "ALR": {
+      "channel": "gov.cn",
+      "url": "https://www.gov.cn/zhengce/zhengceku/2008-03/28/content_6636.htm",
+      "title": "职工带薪年休假条例（国务院令第514号）",
+      "retrieved_at": "2026-10-13"
+    },
+    "MOHRSS-ORDER-1": {
+      "channel": "gov.cn",
+      "url": "https://www.gov.cn/gongbao/content/2009/content_1265995.htm",
+      "title": "企业职工带薪年休假实施办法（人力资源和社会保障部令第1号）",
+      "retrieved_at": "2026-10-13"
+    }
+  },
   "constants": {
     "severance": {
       "cap_multiple_of_social_avg": {
         "value": 3,
         "unit": "倍",
         "basis": ["LCL-47"],
-        "status": "pending",
+        "status": "verified",
         "source": {
-          "channel": "npc.gov.cn",
-          "note": "《劳动合同法》第四十七条：月工资高于本地区上年度职工月平均工资三倍的，按三倍数额支付"
+          "channel": "samr.gov.cn",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+          "retrieved_at": "2026-10-13",
+          "note": "《劳动合同法》第四十七条：「劳动者月工资高于用人单位所在直辖市、设区的市级人民政府公布的本地区上年度职工月平均工资三倍的，向其支付经济补偿的标准按职工月平均工资三倍的数额支付」"
         }
       },
       "cap_years": {
         "value": 12,
         "unit": "年",
         "basis": ["LCL-47"],
-        "status": "pending",
+        "status": "verified",
         "source": {
-          "channel": "npc.gov.cn",
-          "note": "《劳动合同法》第四十七条：支付年限最高不超过十二年（仅适用封顶情形）"
+          "channel": "samr.gov.cn",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+          "retrieved_at": "2026-10-13",
+          "note": "《劳动合同法》第四十七条：「向其支付经济补偿的年限最高不超过十二年」（仅适用封顶情形）"
         }
       },
       "rounding": {
@@ -28,30 +58,36 @@
           "value": 6,
           "unit": "月",
           "basis": ["LCL-47"],
-          "status": "pending",
+          "status": "verified",
           "source": {
-            "channel": "npc.gov.cn",
-            "note": "《劳动合同法》第四十七条：六个月以上不满一年的，按一年计算"
+            "channel": "samr.gov.cn",
+            "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+            "retrieved_at": "2026-10-13",
+            "note": "《劳动合同法》第四十七条：「六个月以上不满一年的，按一年计算」"
           }
         },
         "round_up_to_year": {
           "value": 1,
           "unit": "年",
           "basis": ["LCL-47"],
-          "status": "pending",
+          "status": "verified",
           "source": {
-            "channel": "npc.gov.cn",
-            "note": "满六个月不满一年 → 按一年计"
+            "channel": "samr.gov.cn",
+            "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+            "retrieved_at": "2026-10-13",
+            "note": "《劳动合同法》第四十七条：满六个月不满一年 → 按一年计"
           }
         },
         "round_down_to_half_month": {
           "value": 0.5,
           "unit": "月工资",
           "basis": ["LCL-47"],
-          "status": "pending",
+          "status": "verified",
           "source": {
-            "channel": "npc.gov.cn",
-            "note": "不满六个月的，向劳动者支付半个月工资的经济补偿"
+            "channel": "samr.gov.cn",
+            "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+            "retrieved_at": "2026-10-13",
+            "note": "《劳动合同法》第四十七条：「不满六个月的，向劳动者支付半个月工资的经济补偿」"
           }
         }
       },
@@ -59,43 +95,75 @@
         "value": 12,
         "unit": "月",
         "basis": ["LCL-47"],
-        "status": "pending",
+        "status": "verified",
         "source": {
-          "channel": "npc.gov.cn",
-          "note": "月工资指劳动者在劳动合同解除或终止前十二个月的平均工资"
+          "channel": "samr.gov.cn",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+          "retrieved_at": "2026-10-13",
+          "note": "《劳动合同法》第四十七条：「本条所称月工资是指劳动者在劳动合同解除或者终止前十二个月的平均工资」"
+        }
+      },
+      "compensation_multiple": {
+        "value": 2,
+        "unit": "倍",
+        "basis": ["LCL-87"],
+        "status": "verified",
+        "source": {
+          "channel": "samr.gov.cn",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+          "retrieved_at": "2026-10-13",
+          "note": "《劳动合同法》第八十七条：「用人单位违反本法规定解除或者终止劳动合同的，应当依照本法第四十七条规定的经济补偿标准的二倍向劳动者支付赔偿金」→ 违法解除赔偿金 = 2 × N"
         }
       }
     },
     "overtime": {
+      "standard_daily_hours": {
+        "value": 8,
+        "unit": "小时/日",
+        "basis": ["LL-36"],
+        "status": "verified",
+        "source": {
+          "channel": "samr.gov.cn",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_d9aa750028b14b99a776cb93726a360d.html",
+          "retrieved_at": "2026-10-13",
+          "note": "《劳动法》第三十六条：「国家实行劳动者每日工作时间不超过八小时、平均每周工作时间不超过四十四小时的工时制度。」→ 日工资折算为小时工资的日工时口径"
+        }
+      },
       "rates": {
         "workday_extension": {
           "value": 1.5,
           "unit": "倍工资",
           "basis": ["LL-44"],
-          "status": "pending",
+          "status": "verified",
           "source": {
-            "channel": "npc.gov.cn",
-            "note": "《劳动法》第四十四条：安排延长工作时间的，支付不低于工资的百分之一百五十"
+            "channel": "samr.gov.cn",
+            "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_d9aa750028b14b99a776cb93726a360d.html",
+            "retrieved_at": "2026-10-13",
+            "note": "《劳动法》第四十四条第一项：「安排劳动者延长工作时间的，支付不低于工资的百分之一百五十的工资报酬」"
           }
         },
         "rest_day_no_compensatory": {
           "value": 2.0,
           "unit": "倍工资",
           "basis": ["LL-44"],
-          "status": "pending",
+          "status": "verified",
           "source": {
-            "channel": "npc.gov.cn",
-            "note": "《劳动法》第四十四条：休息日安排工作又不能安排补休的，支付不低于百分之二百"
+            "channel": "samr.gov.cn",
+            "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_d9aa750028b14b99a776cb93726a360d.html",
+            "retrieved_at": "2026-10-13",
+            "note": "《劳动法》第四十四条第二项：「休息日安排劳动者工作又不能安排补休的，支付不低于工资的百分之二百的工资报酬」"
           }
         },
         "statutory_holiday": {
           "value": 3.0,
           "unit": "倍工资",
           "basis": ["LL-44"],
-          "status": "pending",
+          "status": "verified",
           "source": {
-            "channel": "npc.gov.cn",
-            "note": "《劳动法》第四十四条：法定休假日安排工作的，支付不低于百分之三百"
+            "channel": "samr.gov.cn",
+            "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_d9aa750028b14b99a776cb93726a360d.html",
+            "retrieved_at": "2026-10-13",
+            "note": "《劳动法》第四十四条第三项：「法定休假日安排劳动者工作的，支付不低于工资的百分之三百的工资报酬」"
           }
         }
       }
@@ -105,10 +173,12 @@
         "value": "21.75",
         "unit": "天/月",
         "basis": ["MOHRSS-ORDER-1-ART11"],
-        "status": "pending",
+        "status": "verified",
         "source": {
           "channel": "gov.cn",
-          "note": "《企业职工带薪年休假实施办法》第十一条：日工资收入按月工资除以月计薪天数（21.75 天）折算"
+          "url": "https://www.gov.cn/gongbao/content/2009/content_1265995.htm",
+          "retrieved_at": "2026-10-13",
+          "note": "《企业职工带薪年休假实施办法》第十一条：「计算未休年休假工资报酬的日工资收入按照职工本人的月工资除以月计薪天数（21.75天）进行折算」"
         }
       },
       "entitlement_tiers": [
@@ -117,10 +187,12 @@
           "max_service_years_exclusive": 10,
           "days": 5,
           "basis": ["ALR-3"],
-          "status": "pending",
+          "status": "verified",
           "source": {
             "channel": "gov.cn",
-            "note": "《职工带薪年休假条例》第三条：累计工作已满 1 年不满 10 年的，年休假 5 天"
+            "url": "https://www.gov.cn/zhengce/zhengceku/2008-03/28/content_6636.htm",
+            "retrieved_at": "2026-10-13",
+            "note": "《职工带薪年休假条例》第三条：「职工累计工作已满1年不满10年的，年休假5天」"
           }
         },
         {
@@ -128,10 +200,12 @@
           "max_service_years_exclusive": 20,
           "days": 10,
           "basis": ["ALR-3"],
-          "status": "pending",
+          "status": "verified",
           "source": {
             "channel": "gov.cn",
-            "note": "《职工带薪年休假条例》第三条：已满 10 年不满 20 年的，年休假 10 天"
+            "url": "https://www.gov.cn/zhengce/zhengceku/2008-03/28/content_6636.htm",
+            "retrieved_at": "2026-10-13",
+            "note": "《职工带薪年休假条例》第三条：「已满10年不满20年的，年休假10天」"
           }
         },
         {
@@ -139,10 +213,12 @@
           "max_service_years_exclusive": null,
           "days": 15,
           "basis": ["ALR-3"],
-          "status": "pending",
+          "status": "verified",
           "source": {
             "channel": "gov.cn",
-            "note": "《职工带薪年休假条例》第三条：已满 20 年的，年休假 15 天"
+            "url": "https://www.gov.cn/zhengce/zhengceku/2008-03/28/content_6636.htm",
+            "retrieved_at": "2026-10-13",
+            "note": "《职工带薪年休假条例》第三条：「已满20年的，年休假15天」"
           }
         }
       ],
@@ -150,30 +226,36 @@
         "value": 3.0,
         "unit": "倍日工资",
         "basis": ["ALR-5", "MOHRSS-ORDER-1-ART10"],
-        "status": "pending",
+        "status": "verified",
         "source": {
           "channel": "gov.cn",
-          "note": "《职工带薪年休假条例》第五条第三款 + 《实施办法》第十条：未安排年休假的按日工资收入的 300% 支付"
+          "url": "https://www.gov.cn/zhengce/zhengceku/2008-03/28/content_6636.htm",
+          "retrieved_at": "2026-10-13",
+          "note": "《职工带薪年休假条例》第五条第三款：「对职工应休未休的年休假天数，单位应当按照该职工日工资收入的300%支付年休假工资报酬」+《实施办法》第十条同旨"
         }
       },
       "already_paid_portion": {
         "value": 1.0,
         "unit": "倍日工资",
         "basis": ["MOHRSS-ORDER-1-ART10"],
-        "status": "pending",
+        "status": "verified",
         "source": {
           "channel": "gov.cn",
-          "note": "《实施办法》第十条：300% 中已包含用人单位支付正常工作期间的工资收入 → 实际另付 200%"
+          "url": "https://www.gov.cn/gongbao/content/2009/content_1265995.htm",
+          "retrieved_at": "2026-10-13",
+          "note": "《实施办法》第十条：「按照其日工资收入的300%支付未休年休假工资报酬，其中包含用人单位支付职工正常工作期间的工资收入」→ 实际另付 200%"
         }
       },
       "days_per_year": {
         "value": 365,
         "unit": "天",
         "basis": ["MOHRSS-ORDER-1-ART12"],
-        "status": "pending",
+        "status": "verified",
         "source": {
           "channel": "gov.cn",
-          "note": "《实施办法》第十二条：当年度折算＝（当年度在本单位已过日历天数÷365）×全年应休天数"
+          "url": "https://www.gov.cn/gongbao/content/2009/content_1265995.htm",
+          "retrieved_at": "2026-10-13",
+          "note": "《实施办法》第十二条：「折算方法为：（当年度在本单位已过日历天数÷365天）×职工本人全年应当享受的年休假天数-当年度已安排年休假天数」"
         }
       }
     },
@@ -182,20 +264,36 @@
         "value": 1,
         "unit": "月",
         "basis": ["LCL-82"],
-        "status": "pending",
+        "status": "verified",
         "source": {
-          "channel": "npc.gov.cn",
-          "note": "《劳动合同法》第八十二条：自用工之日起超过一个月不满一年未订立书面劳动合同的，支付二倍工资"
+          "channel": "samr.gov.cn",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+          "retrieved_at": "2026-10-13",
+          "note": "《劳动合同法》第八十二条：「用人单位自用工之日起超过一个月不满一年未与劳动者订立书面劳动合同的，应当向劳动者每月支付二倍的工资」"
         }
       },
       "max_months": {
         "value": 11,
         "unit": "月",
         "basis": ["LCL-82"],
-        "status": "pending",
+        "status": "verified",
         "source": {
-          "channel": "npc.gov.cn",
-          "note": "《劳动合同法》第八十二条：二倍工资差额最长计算至满一年前一日（即最长 11 个月）"
+          "channel": "samr.gov.cn",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+          "retrieved_at": "2026-10-13",
+          "note": "《劳动合同法》第八十二条：「超过一个月不满一年」→ 二倍工资差额自用工满一个月的次日起算，最长至用工满一年前一日（最长 11 个月）"
+        }
+      },
+      "difference_multiple": {
+        "value": 1,
+        "unit": "倍月工资",
+        "basis": ["LCL-82"],
+        "status": "verified",
+        "source": {
+          "channel": "samr.gov.cn",
+          "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+          "retrieved_at": "2026-10-13",
+          "note": "《劳动合同法》第八十二条：「应当向劳动者每月支付二倍的工资」→ 已付一倍，另需支付差额 = 1 倍月工资"
         }
       }
     }

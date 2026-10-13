@@ -4,49 +4,86 @@
   "region_name": "北京市",
   "year": 2025,
   "generated_by": "tools/gen_rulesets.py",
-  "status": "pending",
-  "note": "骨架：数值与来源待 M1 逐条核对官方发布后填入并置 status=verified；禁手改，改动走生成器重生成。",
+  "status": "verified",
+  "note": "已核对：数值与来源取自 data/sources/verified-params.json（官方原文逐条核对，留痕见 data/README.md 台账）；禁手改，改动走生成器重生成。",
   "params": {
     "social_avg_wage_monthly": {
-      "value": "0.00",
+      "value": "11937.00",
       "unit": "CNY/month",
-      "caliber": "pending_caliber_registration",
-      "basis_year": 2024,
-      "status": "pending",
+      "status": "verified",
       "source": {
-        "publisher": null,
-        "published_year": null,
-        "doc_no": null,
-        "url": null,
-        "retrieved_at": null
+        "publisher": "北京市人力资源和社会保障局、北京市医疗保障局、国家税务总局北京市税务局",
+        "published_year": 2025,
+        "doc_no": "京人社发〔2025〕11号",
+        "url": "https://rsj.beijing.gov.cn/xxgk/2024zcwj/202509/t20250918_4204880.html",
+        "retrieved_at": "2026-10-13"
       },
-      "note": "上年度职工月平均工资（三倍封顶基数）；口径须与 regions.json 登记一致。"
+      "caliber": "full_caliber_urban_employees",
+      "basis_year": 2024,
+      "note": "原文「自2025年7月起，本市2025年度职工基本养老保险、失业保险、工伤保险、职工基本医疗保险（含生育）月缴费基数上限确定为35811元」。社保缴费基数上限 = 本地区上年度职工月平均工资 × 3 → 社平工资 = 35811 ÷ 3 = 11937 元/月（全口径城镇单位就业人员平均工资）。口径用于《劳动合同法》第四十七条三倍封顶。"
     },
     "min_wage_monthly": {
-      "value": "0.00",
+      "value": "2540.00",
       "unit": "CNY/month",
-      "status": "pending",
+      "status": "verified",
       "source": {
-        "publisher": null,
-        "published_year": null,
-        "doc_no": null,
-        "url": null,
-        "retrieved_at": null
+        "publisher": "北京市人力资源和社会保障局",
+        "published_year": 2025,
+        "doc_no": "京人社劳发〔2025〕7号",
+        "url": "https://rsj.beijing.gov.cn/xxgk/2024zcwj/202507/t20250725_4158456.html",
+        "retrieved_at": "2026-10-13"
       },
-      "note": "当地月最低工资标准（月工资下限用）。"
+      "note": "原文「我市最低工资标准由每小时不低于13.91元、每月不低于2420元，调整到每小时不低于14.6元、每月不低于2540元」，自2025年9月1日起执行。"
     },
     "holiday_calendar": {
-      "days": [],
-      "adjusted_workdays": [],
-      "status": "pending",
+      "days": [
+        "2025-01-01",
+        "2025-01-28",
+        "2025-01-29",
+        "2025-01-30",
+        "2025-01-31",
+        "2025-04-04",
+        "2025-05-01",
+        "2025-05-02",
+        "2025-05-31",
+        "2025-10-01",
+        "2025-10-02",
+        "2025-10-03",
+        "2025-10-06"
+      ],
+      "rest_days": [
+        "2025-02-01",
+        "2025-02-02",
+        "2025-02-03",
+        "2025-02-04",
+        "2025-04-05",
+        "2025-04-06",
+        "2025-05-03",
+        "2025-05-04",
+        "2025-05-05",
+        "2025-06-01",
+        "2025-06-02",
+        "2025-10-04",
+        "2025-10-05",
+        "2025-10-07",
+        "2025-10-08"
+      ],
+      "adjusted_workdays": [
+        "2025-01-26",
+        "2025-02-08",
+        "2025-04-27",
+        "2025-09-28",
+        "2025-10-11"
+      ],
+      "status": "verified",
       "source": {
         "publisher": "国务院办公厅",
-        "published_year": null,
-        "doc_no": null,
-        "url": null,
-        "retrieved_at": null
+        "published_year": 2024,
+        "doc_no": "国办发明电〔2024〕12号",
+        "url": "https://www.gov.cn/zhengce/zhengceku/202411/content_6986383.htm",
+        "retrieved_at": "2026-10-13"
       },
-      "note": "法定节假日（days）与调休上班日（adjusted_workdays），格式 YYYY-MM-DD。"
+      "note": "days = 法定节假日（《全国年节及纪念日放假办法》2024 修订第二条：元旦1天、春节4天（除夕+初一至初三）、清明1天、劳动节2天、端午1天、中秋1天、国庆3天，共 13 天，按 300% 计）；rest_days = 放假安排中属调休/连休但不属法定节假日的休息日（按 200% 计，如春节/劳动节/国庆连休中的非法定日），由国办发明电〔2024〕12号「放假调休」各段减去法定节假日推出；adjusted_workdays = 调休上班日（原休息日改为工作日，按 150% 计）。依据 国办发明电〔2024〕12号。"
     }
   }
 }

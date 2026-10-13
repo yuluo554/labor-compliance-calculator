@@ -74,21 +74,55 @@ def test_calc_unknown_coordinate_returns_input_error(data_dir, tmp_path, capsys)
 
 
 def test_calc_gate_blocked_returns_input_error(data_dir, tmp_path, capsys):
-    """未核对参数包 → 门控拦截 exit 2（核心纪律的可执行证据）。"""
+    """未核对参数包（广东仍 pending）→ 门控拦截 exit 2（核心纪律的可执行证据）。"""
     path = tmp_path / "d.json"
     path.write_text(json.dumps({
-        "employment": {"region_code": "310000", "year": 2026, "hire_date": "2020-01-01"},
+        "employment": {"region_code": "440000", "year": 2026, "hire_date": "2020-01-01"},
         "termination": {"ground": "mutual_agreement"},
     }), encoding="utf-8")
     assert cli.main(["--data-dir", data_dir, "calc", str(path)]) == EXIT_INPUT_ERROR
     assert "未核对" in capsys.readouterr().err
 
 
+def test_calc_verified_coordinate_passes_gate_into_engine(data_dir, tmp_path, capsys):
+    """已核对坐标（北京 2025）→ 门控放行进入引擎；引擎待 M2 → exit 1（M1 完成判据）。"""
+    path = tmp_path / "verified.json"
+    path.write_text(json.dumps({
+        "employment": {"region_code": "110000", "year": 2025, "hire_date": "2020-01-01"},
+        "termination": {"ground": "mutual_agreement"},
+    }), encoding="utf-8")
+    code = cli.main(["--data-dir", data_dir, "calc", str(path)])
+    assert code == EXIT_DEGRADED
+    err = capsys.readouterr().err
+    assert "M2" in err
+    assert "未核对" not in err
+
+
+def test_calc_real_truth_record_passes_gate(data_dir, tmp_path, capsys):
+    """M1 完成判据的可执行证据：真值库中的真实记录（已核对坐标）走完整通路。
+
+    真值库记录 → 抽出 input_facts 写单条 → 坐标加载 → 门控放行 → 引擎（待 M2，exit 1）。
+    与 pending 坐标（exit 2）形成对照；证明门控对已核对坐标确实放通。
+    """
+    truth_path = os.path.join(data_dir, "truth", "cases-boundary.json")
+    with open(truth_path, "r", encoding="utf-8") as handle:
+        record = json.load(handle)["cases"][0]
+    assert tuple(record["coordinate"]) in (
+        ("110000", 2025), ("110000", 2026), ("310000", 2025), ("310000", 2026))
+
+    path = tmp_path / "record.json"
+    path.write_text(json.dumps(record, ensure_ascii=False), encoding="utf-8")
+    assert cli.main(["--data-dir", data_dir, "calc", str(path)]) == EXIT_DEGRADED
+    err = capsys.readouterr().err
+    assert "M2" in err
+    assert "未核对" not in err
+
+
 def test_calc_preview_returns_degraded(data_dir, tmp_path, capsys):
     """预览模式：门控放行取参数，但引擎未实现 → exit 1，且无金额输出。"""
     path = tmp_path / "e.json"
     path.write_text(json.dumps({
-        "employment": {"region_code": "310000", "year": 2026, "hire_date": "2020-01-01"},
+        "employment": {"region_code": "440000", "year": 2026, "hire_date": "2020-01-01"},
         "termination": {"ground": "mutual_agreement"},
     }), encoding="utf-8")
     code = cli.main(["--data-dir", data_dir, "calc", "--preview", str(path)])

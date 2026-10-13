@@ -1,26 +1,36 @@
 {
   "schema_version": 1,
-  "note": "地区主数据：行政区划码 + 社平工资口径登记（口径为必填，禁止跨地区套用；见 plan/01 §五 口径警示）。全部地区初始化 status=pending，M1 逐地区核对官方发布后置 verified。",
+  "note": "地区主数据：行政区划码 + 社平工资口径登记（口径为必填，禁止跨地区套用；见 plan/01 §五 口径警示）。北京、上海已于 M1 核对官方发布后置 verified（口径=全口径城镇单位就业人员平均工资，依据见 data/README.md 台账）；广东、江苏待核对仍为 pending。",
   "regions": [
     {
       "code": "110000",
       "name": "北京市",
       "level": "province",
       "parent": null,
-      "avg_wage_caliber": "pending_caliber_registration",
-      "caliber_note": "口径待核对：需确认北京市用于劳动合同法第 47 条封顶的社平工资口径（全口径城镇单位就业人员平均工资 / 城镇非私营在岗职工平均工资）",
-      "status": "pending",
-      "source": { "publisher": null, "published_year": null, "url": null, "retrieved_at": null }
+      "avg_wage_caliber": "full_caliber_urban_employees",
+      "caliber_note": "口径已核对：北京市用于《劳动合同法》第 47 条封顶的社平工资为「全口径城镇单位就业人员平均工资」，由社保缴费基数上限 ÷ 3 得出（京人社发〔2025〕11号 / 〔2026〕7号）。",
+      "status": "verified",
+      "source": {
+        "publisher": "北京市人力资源和社会保障局",
+        "published_year": 2025,
+        "url": "https://rsj.beijing.gov.cn/xxgk/2024zcwj/202509/t20250918_4204880.html",
+        "retrieved_at": "2026-10-13"
+      }
     },
     {
       "code": "310000",
       "name": "上海市",
       "level": "province",
       "parent": null,
-      "avg_wage_caliber": "pending_caliber_registration",
-      "caliber_note": "口径待核对：需确认上海市用于劳动合同法第 47 条封顶的社平工资口径",
-      "status": "pending",
-      "source": { "publisher": null, "published_year": null, "url": null, "retrieved_at": null }
+      "avg_wage_caliber": "full_caliber_urban_employees",
+      "caliber_note": "口径已核对：上海市人社局通告原文直接写明「本市 20XX 年度全口径城镇单位就业人员平均工资」，用于《劳动合同法》第 47 条封顶。",
+      "status": "verified",
+      "source": {
+        "publisher": "上海市人力资源和社会保障局",
+        "published_year": 2025,
+        "url": "https://rsj.sh.gov.cn/tgsgg_17341/20250918/t0035_1435637.html",
+        "retrieved_at": "2026-10-13"
+      }
     },
     {
       "code": "440000",

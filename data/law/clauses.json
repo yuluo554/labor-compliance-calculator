@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "note": "法条条款库：以「法律名 + 条号 + 要点」形式呈现（规避全文转载，data/README §四）；points 为要点摘述，非逐字全文。status=pending 表示条号/要点尚待官方原文逐字核对（M1-3）。",
+  "note": "法条条款库：以「法律名 + 条号 + 要点」形式呈现（规避全文转载，data/README §四）；points 为要点摘述，非逐字全文。全部条目已于 M1 逐条核对官方原文并置 status=verified（官方原文核对记录见 data/README.md 台账）。",
   "clauses": [
     {
       "id": "LCL-36",
@@ -9,10 +9,14 @@
       "title": "协商一致解除劳动合同",
       "points": [
         "用人单位与劳动者协商一致，可以解除劳动合同",
-        "协商一致解除属于第 46 条应当支付经济补偿的情形"
+        "由用人单位提出并协商一致解除的，属第 46 条第 2 项应当支付经济补偿的情形"
       ],
-      "status": "pending",
-      "source": { "channel": "npc.gov.cn", "url": null, "retrieved_at": null }
+      "status": "verified",
+      "source": {
+        "channel": "samr.gov.cn",
+        "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+        "retrieved_at": "2026-10-13"
+      }
     },
     {
       "id": "LCL-38",
@@ -20,11 +24,16 @@
       "article": "第三十八条",
       "title": "劳动者被迫解除（用人单位违法情形）",
       "points": [
-        "用人单位未按约定提供劳动保护/劳动条件、未及时足额支付劳动报酬、未依法缴纳社保等情形，劳动者可以解除劳动合同",
+        "用人单位未按约定提供劳动保护或劳动条件、未及时足额支付劳动报酬、未依法缴纳社保、规章制度违法损害权益等情形，劳动者可以解除劳动合同",
+        "以暴力、威胁或非法限制人身自由手段强迫劳动，或违章指挥、强令冒险作业危及人身安全的，劳动者可立即解除，不需事先告知",
         "劳动者依本条解除的，用人单位应当支付经济补偿（第 46 条第 1 项）"
       ],
-      "status": "pending",
-      "source": { "channel": "npc.gov.cn", "url": null, "retrieved_at": null }
+      "status": "verified",
+      "source": {
+        "channel": "samr.gov.cn",
+        "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+        "retrieved_at": "2026-10-13"
+      }
     },
     {
       "id": "LCL-39",
@@ -32,11 +41,15 @@
       "article": "第三十九条",
       "title": "劳动者过错的即时解除",
       "points": [
-        "试用期不符合录用条件、严重违反规章制度、严重失职营私舞弊、兼职影响本职工作、欺诈胁迫致合同无效、被追究刑事责任等情形，用人单位可以解除",
+        "试用期不符合录用条件、严重违反规章制度、严重失职营私舞弊造成重大损害、兼职严重影响工作或经提出拒不改正、欺诈胁迫致合同无效、被追究刑事责任等情形，用人单位可以解除",
         "依本条解除的，用人单位无需支付经济补偿"
       ],
-      "status": "pending",
-      "source": { "channel": "npc.gov.cn", "url": null, "retrieved_at": null }
+      "status": "verified",
+      "source": {
+        "channel": "samr.gov.cn",
+        "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+        "retrieved_at": "2026-10-13"
+      }
     },
     {
       "id": "LCL-40",
@@ -44,11 +57,15 @@
       "article": "第四十条",
       "title": "无过失性辞退与代通知金",
       "points": [
-        "患病或非因工负伤医疗期满不能从事原工作、不胜任工作经培训或调岗仍不胜任、客观情况重大变化致合同无法履行等情形，提前三十日书面通知或额外支付一个月工资后可解除",
+        "患病或非因工负伤医疗期满不能从事原工作也不能从事另行安排的工作、不能胜任工作经培训或调岗仍不能胜任、客观情况重大变化致合同无法履行且协商不成等情形，用人单位提前三十日书面通知或额外支付一个月工资后可以解除",
         "未提前三十日通知而额外支付一个月工资的，该一个月工资即代通知金（N+1 中的 +1）"
       ],
-      "status": "pending",
-      "source": { "channel": "npc.gov.cn", "url": null, "retrieved_at": null }
+      "status": "verified",
+      "source": {
+        "channel": "samr.gov.cn",
+        "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+        "retrieved_at": "2026-10-13"
+      }
     },
     {
       "id": "LCL-41",
@@ -56,11 +73,15 @@
       "article": "第四十一条",
       "title": "经济性裁员",
       "points": [
-        "依企业破产法重整、生产经营发生严重困难、转产重大技术革新或经营方式调整等情形，裁减人员二十人以上或不足二十人但占职工总数百分之十以上的，履行法定程序后可裁减",
-        "经济性裁员属于应当支付经济补偿的情形"
+        "依企业破产法重整、生产经营发生严重困难、转产重大技术革新或经营方式调整经变更合同后仍需裁减、其他客观经济情况重大变化致合同无法履行等情形，裁减二十人以上或不足二十人但占职工总数百分之十以上的，提前三十日说明情况并听取意见、向劳动行政部门报告后可裁减",
+        "经济性裁员属于应当支付经济补偿的情形（第 46 条第 4 项）"
       ],
-      "status": "pending",
-      "source": { "channel": "npc.gov.cn", "url": null, "retrieved_at": null }
+      "status": "verified",
+      "source": {
+        "channel": "samr.gov.cn",
+        "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+        "retrieved_at": "2026-10-13"
+      }
     },
     {
       "id": "LCL-46",
@@ -68,10 +89,14 @@
       "article": "第四十六条",
       "title": "应当支付经济补偿的情形",
       "points": [
-        "列举应当支付经济补偿的七类情形：劳动者依第 38 条解除、协商一致由用人单位提出解除、依第 40 条解除、依第 41 条第一款裁员、除用人单位维持或提高约定条件续订而劳动者不同意外的合同期满终止、依第 44 条第 4/5 项终止、法律法规规定的其他情形"
+        "列举应当支付经济补偿的情形：劳动者依第 38 条解除、用人单位依第 36 条提出并协商一致解除、依第 40 条解除、依第 41 条第一款裁员、除用人单位维持或提高约定条件续订而劳动者不同意外的合同期满终止、依第 44 条第 4/5 项终止、法律法规规定的其他情形"
       ],
-      "status": "pending",
-      "source": { "channel": "npc.gov.cn", "url": null, "retrieved_at": null }
+      "status": "verified",
+      "source": {
+        "channel": "samr.gov.cn",
+        "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+        "retrieved_at": "2026-10-13"
+      }
     },
     {
       "id": "LCL-47",
@@ -79,13 +104,17 @@
       "article": "第四十七条",
       "title": "经济补偿的计算标准（三倍封顶与十二年上限）",
       "points": [
-        "按劳动者在本单位工作的年限，每满一年支付一个月工资的标准向劳动者支付",
+        "经济补偿按劳动者在本单位工作的年限，每满一年支付一个月工资的标准向劳动者支付",
         "六个月以上不满一年的，按一年计算；不满六个月的，向劳动者支付半个月工资的经济补偿",
         "劳动者月工资高于用人单位所在直辖市、设区的市级人民政府公布的本地区上年度职工月平均工资三倍的，向其支付经济补偿的标准按职工月平均工资三倍的数额支付，支付年限最高不超过十二年",
         "月工资指劳动者在劳动合同解除或者终止前十二个月的平均工资"
       ],
-      "status": "pending",
-      "source": { "channel": "npc.gov.cn", "url": null, "retrieved_at": null }
+      "status": "verified",
+      "source": {
+        "channel": "samr.gov.cn",
+        "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+        "retrieved_at": "2026-10-13"
+      }
     },
     {
       "id": "LCL-48",
@@ -96,8 +125,12 @@
         "用人单位违法解除或终止劳动合同，劳动者要求继续履行的，用人单位应当继续履行",
         "劳动者不要求继续履行或已不能继续履行的，用人单位应当依第 87 条支付赔偿金"
       ],
-      "status": "pending",
-      "source": { "channel": "npc.gov.cn", "url": null, "retrieved_at": null }
+      "status": "verified",
+      "source": {
+        "channel": "samr.gov.cn",
+        "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+        "retrieved_at": "2026-10-13"
+      }
     },
     {
       "id": "LCL-82",
@@ -108,8 +141,12 @@
         "用人单位自用工之日起超过一个月不满一年未与劳动者订立书面劳动合同的，应当向劳动者每月支付二倍的工资",
         "二倍工资的差额部分自用工满一个月的次日起算，最长计算至用工满一年的前一日"
       ],
-      "status": "pending",
-      "source": { "channel": "npc.gov.cn", "url": null, "retrieved_at": null }
+      "status": "verified",
+      "source": {
+        "channel": "samr.gov.cn",
+        "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+        "retrieved_at": "2026-10-13"
+      }
     },
     {
       "id": "LCL-87",
@@ -119,8 +156,27 @@
       "points": [
         "用人单位违反本法规定解除或者终止劳动合同的，应当依照本法第四十七条规定的经济补偿标准的二倍向劳动者支付赔偿金"
       ],
-      "status": "pending",
-      "source": { "channel": "npc.gov.cn", "url": null, "retrieved_at": null }
+      "status": "verified",
+      "source": {
+        "channel": "samr.gov.cn",
+        "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0abfdd261c03417b949df19d869add8d.html",
+        "retrieved_at": "2026-10-13"
+      }
+    },
+    {
+      "id": "LL-36",
+      "law": "中华人民共和国劳动法",
+      "article": "第三十六条",
+      "title": "标准工时制度（日/周工作时长）",
+      "points": [
+        "国家实行劳动者每日工作时间不超过八小时、平均每周工作时间不超过四十四小时的工时制度"
+      ],
+      "status": "verified",
+      "source": {
+        "channel": "samr.gov.cn",
+        "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_d9aa750028b14b99a776cb93726a360d.html",
+        "retrieved_at": "2026-10-13"
+      }
     },
     {
       "id": "LL-44",
@@ -132,8 +188,12 @@
         "休息日安排劳动者工作又不能安排补休的，支付不低于工资的百分之二百的工资报酬",
         "法定休假日安排劳动者工作的，支付不低于工资的百分之三百的工资报酬"
       ],
-      "status": "pending",
-      "source": { "channel": "npc.gov.cn", "url": null, "retrieved_at": null }
+      "status": "verified",
+      "source": {
+        "channel": "samr.gov.cn",
+        "url": "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_d9aa750028b14b99a776cb93726a360d.html",
+        "retrieved_at": "2026-10-13"
+      }
     },
     {
       "id": "ALR-3",
@@ -143,10 +203,15 @@
       "points": [
         "职工累计工作已满 1 年不满 10 年的，年休假 5 天",
         "已满 10 年不满 20 年的，年休假 10 天",
-        "已满 20 年的，年休假 15 天"
+        "已满 20 年的，年休假 15 天",
+        "国家法定休假日、休息日不计入年休假的假期"
       ],
-      "status": "pending",
-      "source": { "channel": "gov.cn", "url": null, "retrieved_at": null }
+      "status": "verified",
+      "source": {
+        "channel": "gov.cn",
+        "url": "https://www.gov.cn/zhengce/zhengceku/2008-03/28/content_6636.htm",
+        "retrieved_at": "2026-10-13"
+      }
     },
     {
       "id": "ALR-5",
@@ -156,10 +221,14 @@
       "points": [
         "单位根据生产、工作的具体情况，并考虑职工本人意愿，统筹安排职工年休假",
         "年休假在 1 个年度内可以集中安排，也可以分段安排，一般不跨年度安排",
-        "单位确因工作需要不能安排职工休年休假的，经职工本人同意，可以不安排；对职工应休未休的年休假天数，按照该职工日工资收入的 300% 支付年休假工资报酬"
+        "单位确因工作需要不能安排职工休年休假的，经职工本人同意，可以不安排；对职工应休未休的年休假天数，单位应当按照该职工日工资收入的 300% 支付年休假工资报酬"
       ],
-      "status": "pending",
-      "source": { "channel": "gov.cn", "url": null, "retrieved_at": null }
+      "status": "verified",
+      "source": {
+        "channel": "gov.cn",
+        "url": "https://www.gov.cn/zhengce/zhengceku/2008-03/28/content_6636.htm",
+        "retrieved_at": "2026-10-13"
+      }
     },
     {
       "id": "MOHRSS-ORDER-1-ART10",
@@ -167,11 +236,15 @@
       "article": "第十条",
       "title": "未休年休假工资报酬的构成（含已付正常工资）",
       "points": [
-        "用人单位经职工同意不安排年休假或安排年休假天数少于应休天数的，应当在本年度内对职工应休未休年休假天数，按照其日工资收入的 300% 支付未休年休假工资报酬，其中包含用人单位支付职工正常工作期间的工资收入",
+        "用人单位经职工同意不安排年休假或安排休假天数少于应休天数的，应当在本年度内对应休未休天数按其日工资收入的 300% 支付未休年休假工资报酬，其中包含用人单位支付职工正常工作期间的工资收入",
         "职工因本人原因且书面提出不休年休假的，用人单位可以只支付其正常工作期间的工资收入"
       ],
-      "status": "pending",
-      "source": { "channel": "gov.cn", "url": null, "retrieved_at": null }
+      "status": "verified",
+      "source": {
+        "channel": "gov.cn",
+        "url": "https://www.gov.cn/gongbao/content/2009/content_1265995.htm",
+        "retrieved_at": "2026-10-13"
+      }
     },
     {
       "id": "MOHRSS-ORDER-1-ART11",
@@ -180,10 +253,14 @@
       "title": "日工资收入的计算口径（21.75 天）",
       "points": [
         "计算未休年休假工资报酬的日工资收入按照职工本人的月工资除以月计薪天数（21.75 天）进行折算",
-        "月工资指职工在用人单位支付其未休年休假工资报酬前 12 个月剔除加班工资后的月平均工资"
+        "月工资指职工在用人单位支付其未休年休假工资报酬前 12 个月剔除加班工资后的月平均工资；在本单位工作时间不满 12 个月的，按实际月份计算月平均工资"
       ],
-      "status": "pending",
-      "source": { "channel": "gov.cn", "url": null, "retrieved_at": null }
+      "status": "verified",
+      "source": {
+        "channel": "gov.cn",
+        "url": "https://www.gov.cn/gongbao/content/2009/content_1265995.htm",
+        "retrieved_at": "2026-10-13"
+      }
     },
     {
       "id": "MOHRSS-ORDER-1-ART12",
@@ -194,8 +271,12 @@
         "用人单位与职工解除或者终止劳动合同时，当年度未安排职工休满应休年休假的，应当按照职工当年已工作时间折算应休未休年休假天数并支付未休年休假工资报酬，但折算后不足 1 整天的部分不支付未休年休假工资报酬",
         "折算方法：（当年度在本单位已过日历天数÷365 天）×职工本人全年应当享受的年休假天数－当年度已安排年休假天数"
       ],
-      "status": "pending",
-      "source": { "channel": "gov.cn", "url": null, "retrieved_at": null }
+      "status": "verified",
+      "source": {
+        "channel": "gov.cn",
+        "url": "https://www.gov.cn/gongbao/content/2009/content_1265995.htm",
+        "retrieved_at": "2026-10-13"
+      }
     }
   ]
 }

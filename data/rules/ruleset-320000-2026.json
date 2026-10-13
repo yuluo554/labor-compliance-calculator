@@ -37,6 +37,7 @@
     },
     "holiday_calendar": {
       "days": [],
+      "rest_days": [],
       "adjusted_workdays": [],
       "status": "pending",
       "source": {
@@ -46,7 +47,7 @@
         "url": null,
         "retrieved_at": null
       },
-      "note": "法定节假日（days）与调休上班日（adjusted_workdays），格式 YYYY-MM-DD。"
+      "note": "法定节假日（days，300%）、调休休息日（rest_days，200%）、调休上班日（adjusted_workdays，150%），格式 YYYY-MM-DD。"
     }
   }
 }

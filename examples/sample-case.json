@@ -1,6 +1,6 @@
 {
   "case_id": "sample-001",
-  "note": "示例输入：上海地区 2026 年度，协商一致解除。M0 阶段参数包 status=pending → 门控拦截（预期退出码 2）；--preview 可查看参数元信息但不输出金额。",
+  "note": "示例输入：上海地区 2026 年度，协商一致解除。该坐标已在 M1 核对官方原文并置 status=verified → 门控放行进入引擎（四引擎待 M2/M3，当前 exit 1 并提示里程碑）。若要看门控拦截（exit 2），把 region_code 改为 440000（广东仍 pending）。",
   "input_facts": {
     "employment": {
       "region_code": "310000",

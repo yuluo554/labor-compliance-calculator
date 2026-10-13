@@ -4,49 +4,92 @@
   "region_name": "上海市",
   "year": 2026,
   "generated_by": "tools/gen_rulesets.py",
-  "status": "pending",
-  "note": "骨架：数值与来源待 M1 逐条核对官方发布后填入并置 status=verified；禁手改，改动走生成器重生成。",
+  "status": "verified",
+  "note": "已核对：数值与来源取自 data/sources/verified-params.json（官方原文逐条核对，留痕见 data/README.md 台账）；禁手改，改动走生成器重生成。",
   "params": {
     "social_avg_wage_monthly": {
-      "value": "0.00",
+      "value": "12577.00",
       "unit": "CNY/month",
-      "caliber": "pending_caliber_registration",
-      "basis_year": 2025,
-      "status": "pending",
+      "status": "verified",
       "source": {
-        "publisher": null,
-        "published_year": null,
+        "publisher": "上海市人力资源和社会保障局",
+        "published_year": 2026,
         "doc_no": null,
-        "url": null,
-        "retrieved_at": null
+        "url": "https://rsj.sh.gov.cn/tgsgg_17341/20260818/t0035_1443203.html",
+        "retrieved_at": "2026-10-13"
       },
-      "note": "上年度职工月平均工资（三倍封顶基数）；口径须与 regions.json 登记一致。"
+      "caliber": "full_caliber_urban_employees",
+      "basis_year": 2025,
+      "note": "原文「2026年7月1日起，本市社保缴费基数的上限调整为37731元/月，下限调整为7546元/月。本市2025年度全口径城镇单位就业人员平均工资为12577元/月」——原文直接写明，且 37731 ÷ 3 = 12577 双重印证。"
     },
     "min_wage_monthly": {
-      "value": "0.00",
+      "value": "2740.00",
       "unit": "CNY/month",
-      "status": "pending",
+      "status": "verified",
       "source": {
-        "publisher": null,
-        "published_year": null,
-        "doc_no": null,
-        "url": null,
-        "retrieved_at": null
+        "publisher": "上海市人力资源和社会保障局",
+        "published_year": 2025,
+        "doc_no": "沪人社规〔2025〕10号",
+        "url": "https://rsj.sh.gov.cn/tgzfl_17732/20250714/t0035_1434097.html",
+        "retrieved_at": "2026-10-13"
       },
-      "note": "当地月最低工资标准（月工资下限用）。"
+      "note": "沿用现行有效标准（沪人社规〔2025〕10号，2740 元/月，自2025-07-01执行）。截至 2026-10-13 官方政策库未见 2026 年度调整通知。"
     },
     "holiday_calendar": {
-      "days": [],
-      "adjusted_workdays": [],
-      "status": "pending",
+      "days": [
+        "2026-01-01",
+        "2026-02-16",
+        "2026-02-17",
+        "2026-02-18",
+        "2026-02-19",
+        "2026-04-05",
+        "2026-05-01",
+        "2026-05-02",
+        "2026-06-19",
+        "2026-09-25",
+        "2026-10-01",
+        "2026-10-02",
+        "2026-10-03"
+      ],
+      "rest_days": [
+        "2026-01-02",
+        "2026-01-03",
+        "2026-02-15",
+        "2026-02-20",
+        "2026-02-21",
+        "2026-02-22",
+        "2026-02-23",
+        "2026-04-04",
+        "2026-04-06",
+        "2026-05-03",
+        "2026-05-04",
+        "2026-05-05",
+        "2026-06-20",
+        "2026-06-21",
+        "2026-09-26",
+        "2026-09-27",
+        "2026-10-04",
+        "2026-10-05",
+        "2026-10-06",
+        "2026-10-07"
+      ],
+      "adjusted_workdays": [
+        "2026-01-04",
+        "2026-02-14",
+        "2026-02-28",
+        "2026-05-09",
+        "2026-09-20",
+        "2026-10-10"
+      ],
+      "status": "verified",
       "source": {
         "publisher": "国务院办公厅",
-        "published_year": null,
-        "doc_no": null,
-        "url": null,
-        "retrieved_at": null
+        "published_year": 2025,
+        "doc_no": "国办发明电〔2025〕7号",
+        "url": "https://www.gov.cn/zhengce/zhengceku/202511/content_7047091.htm",
+        "retrieved_at": "2026-10-13"
       },
-      "note": "法定节假日（days）与调休上班日（adjusted_workdays），格式 YYYY-MM-DD。"
+      "note": "法定节假日为全国统一安排（国务院办公厅发布），逐地区一致。days = 13 个法定节假日（300%），adjusted_workdays = 调休上班日。"
     }
   }
 }

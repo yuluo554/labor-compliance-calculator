@@ -143,10 +143,32 @@ class Ruleset(object):
         calendar = (self.raw.get("params") or {}).get("holiday_calendar") or {}
         return list(calendar.get("days") or [])
 
+    def rest_days(self):
+        # type: () -> list
+        """调休休息日（非法定节假日但放假）：按休息日口径（200%）计。"""
+        calendar = (self.raw.get("params") or {}).get("holiday_calendar") or {}
+        return list(calendar.get("rest_days") or [])
+
     def adjusted_workdays(self):
         # type: () -> list
         calendar = (self.raw.get("params") or {}).get("holiday_calendar") or {}
         return list(calendar.get("adjusted_workdays") or [])
+
+    def holiday_day_type(self, day):
+        # type: (str) -> str
+        """把日期串归入日历四类之一：``statutory_holiday`` / ``rest_day`` /
+        ``adjusted_workday`` / ``workday``。
+
+        日历**唯一来源**（plan/04 §4.3）：引擎不得自行判定日期类型——否则
+        政策语义会出现第二份实现。日历未覆盖的日期一律按 ``workday``。
+        """
+        if day in self.holiday_days():
+            return "statutory_holiday"
+        if day in self.rest_days():
+            return "rest_day"
+        if day in self.adjusted_workdays():
+            return "adjusted_workday"
+        return "workday"
 
     def __repr__(self):
         # type: () -> str

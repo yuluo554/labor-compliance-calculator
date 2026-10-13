@@ -12,19 +12,31 @@ from lcc.errors import GateError
 
 
 def test_pending_ruleset_is_blocked(data_dir):
-    """初始化参数包全部 pending → 门控必须拒绝（这是纪律行为）。"""
-    ruleset = params.load_ruleset("310000", 2026, data_dir=data_dir)
+    """未核对参数包（广东仍 pending）→ 门控必须拒绝（这是纪律行为）。"""
+    ruleset = params.load_ruleset("440000", 2026, data_dir=data_dir)
     with pytest.raises(GateError) as exc:
         gate.effective_ruleset(ruleset, data_dir=data_dir)
     assert "未核对" in str(exc.value)
 
 
+def test_verified_ruleset_passes_gate(data_dir):
+    """已核对坐标（北京 2025）→ 门控放行，且能取到已验证数值（M1 数据先行证据）。"""
+    ruleset = params.load_ruleset("110000", 2025, data_dir=data_dir)
+    assert ruleset.status == "verified"
+    effective = gate.effective_ruleset(ruleset, data_dir=data_dir)
+    assert effective.coordinate == ("110000", 2025)
+    assert effective.social_avg_wage_monthly() > 0
+    assert effective.min_wage_monthly() > 0
+    assert effective.holiday_days()
+
+
 def test_pending_list_covers_ruleset_and_constants(data_dir):
-    ruleset = params.load_ruleset("310000", 2026, data_dir=data_dir)
+    ruleset = params.load_ruleset("440000", 2026, data_dir=data_dir)
     constants = params.load_constants(data_dir)
     pending = gate.pending_entries(ruleset, constants)
     assert any(item.startswith("ruleset.") for item in pending)
-    assert any(item.startswith("constants.") for item in pending)
+    # 常数包已全量核对 → 不应再有 constants.* 待核对项（M1-2 证据）
+    assert not any(item.startswith("constants.") for item in pending)
 
 
 def test_allow_pending_preview_does_not_produce_amounts(data_dir):

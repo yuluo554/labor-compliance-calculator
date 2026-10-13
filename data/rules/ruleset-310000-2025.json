@@ -4,49 +4,86 @@
   "region_name": "上海市",
   "year": 2025,
   "generated_by": "tools/gen_rulesets.py",
-  "status": "pending",
-  "note": "骨架：数值与来源待 M1 逐条核对官方发布后填入并置 status=verified；禁手改，改动走生成器重生成。",
+  "status": "verified",
+  "note": "已核对：数值与来源取自 data/sources/verified-params.json（官方原文逐条核对，留痕见 data/README.md 台账）；禁手改，改动走生成器重生成。",
   "params": {
     "social_avg_wage_monthly": {
-      "value": "0.00",
+      "value": "12434.00",
       "unit": "CNY/month",
-      "caliber": "pending_caliber_registration",
-      "basis_year": 2024,
-      "status": "pending",
+      "status": "verified",
       "source": {
-        "publisher": null,
-        "published_year": null,
+        "publisher": "上海市人力资源和社会保障局",
+        "published_year": 2025,
         "doc_no": null,
-        "url": null,
-        "retrieved_at": null
+        "url": "https://rsj.sh.gov.cn/tgsgg_17341/20250918/t0035_1435637.html",
+        "retrieved_at": "2026-10-13"
       },
-      "note": "上年度职工月平均工资（三倍封顶基数）；口径须与 regions.json 登记一致。"
+      "caliber": "full_caliber_urban_employees",
+      "basis_year": 2024,
+      "note": "原文「自2025年7月1日起，本市社保缴费基数的上限调整为37302元/月，下限调整为7460元/月。本市2024年度全口径城镇单位就业人员平均工资为12434元/月」——社平工资原文直接写明，且 37302 ÷ 3 = 12434 双重印证。"
     },
     "min_wage_monthly": {
-      "value": "0.00",
+      "value": "2740.00",
       "unit": "CNY/month",
-      "status": "pending",
+      "status": "verified",
       "source": {
-        "publisher": null,
-        "published_year": null,
-        "doc_no": null,
-        "url": null,
-        "retrieved_at": null
+        "publisher": "上海市人力资源和社会保障局",
+        "published_year": 2025,
+        "doc_no": "沪人社规〔2025〕10号",
+        "url": "https://rsj.sh.gov.cn/tgzfl_17732/20250714/t0035_1434097.html",
+        "retrieved_at": "2026-10-13"
       },
-      "note": "当地月最低工资标准（月工资下限用）。"
+      "note": "原文「从2025年7月1日起，本市调整最低工资标准……月最低工资标准从2690元调整到2740元」。"
     },
     "holiday_calendar": {
-      "days": [],
-      "adjusted_workdays": [],
-      "status": "pending",
+      "days": [
+        "2025-01-01",
+        "2025-01-28",
+        "2025-01-29",
+        "2025-01-30",
+        "2025-01-31",
+        "2025-04-04",
+        "2025-05-01",
+        "2025-05-02",
+        "2025-05-31",
+        "2025-10-01",
+        "2025-10-02",
+        "2025-10-03",
+        "2025-10-06"
+      ],
+      "rest_days": [
+        "2025-02-01",
+        "2025-02-02",
+        "2025-02-03",
+        "2025-02-04",
+        "2025-04-05",
+        "2025-04-06",
+        "2025-05-03",
+        "2025-05-04",
+        "2025-05-05",
+        "2025-06-01",
+        "2025-06-02",
+        "2025-10-04",
+        "2025-10-05",
+        "2025-10-07",
+        "2025-10-08"
+      ],
+      "adjusted_workdays": [
+        "2025-01-26",
+        "2025-02-08",
+        "2025-04-27",
+        "2025-09-28",
+        "2025-10-11"
+      ],
+      "status": "verified",
       "source": {
         "publisher": "国务院办公厅",
-        "published_year": null,
-        "doc_no": null,
-        "url": null,
-        "retrieved_at": null
+        "published_year": 2024,
+        "doc_no": "国办发明电〔2024〕12号",
+        "url": "https://www.gov.cn/zhengce/zhengceku/202411/content_6986383.htm",
+        "retrieved_at": "2026-10-13"
       },
-      "note": "法定节假日（days）与调休上班日（adjusted_workdays），格式 YYYY-MM-DD。"
+      "note": "法定节假日为全国统一安排（国务院办公厅发布），逐地区一致。days = 13 个法定节假日（300%），adjusted_workdays = 调休上班日。"
     }
   }
 }

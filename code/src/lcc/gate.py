@@ -123,12 +123,31 @@ class EffectiveRuleset(object):
             raise GateError("参数 {} 未核对（pending）".format(entry.path), [_PENDING_HINT])
         return self._ruleset.holiday_days()
 
+    def rest_days(self):
+        # type: () -> list
+        entry = self._ruleset.get("holiday_calendar")
+        if entry.status == STATUS_PENDING and not self._allow_pending:
+            raise GateError("参数 {} 未核对（pending）".format(entry.path), [_PENDING_HINT])
+        return self._ruleset.rest_days()
+
     def adjusted_workdays(self):
         # type: () -> list
         entry = self._ruleset.get("holiday_calendar")
         if entry.status == STATUS_PENDING and not self._allow_pending:
             raise GateError("参数 {} 未核对（pending）".format(entry.path), [_PENDING_HINT])
         return self._ruleset.adjusted_workdays()
+
+    def holiday_day_type(self, day):
+        # type: (str) -> str
+        """日期 → ``statutory_holiday`` / ``rest_day`` / ``adjusted_workday`` / ``workday``。
+
+        日历是判定日期类型的**唯一来源**（plan/04 §4.3）：引擎不得自建日历逻辑，
+        否则政策语义会出现第二份实现。
+        """
+        entry = self._ruleset.get("holiday_calendar")
+        if entry.status == STATUS_PENDING and not self._allow_pending:
+            raise GateError("参数 {} 未核对（pending）".format(entry.path), [_PENDING_HINT])
+        return self._ruleset.holiday_day_type(day)
 
     def param_source(self, name):
         # type: (str) -> dict
@@ -164,6 +183,12 @@ class EffectiveRuleset(object):
         return to_decimal(self._const("severance.rounding.round_down_to_half_month"),
                           "severance.rounding.round_down_to_half_month")
 
+    def compensation_multiple(self):
+        # type: () -> Decimal
+        """违法解除赔偿金倍数（2N 的 2）。"""
+        return to_decimal(self._const("severance.compensation_multiple"),
+                          "severance.compensation_multiple")
+
     def severance_basis(self):
         # type: () -> list
         return self._const_entry("severance.cap_years").basis
@@ -173,6 +198,11 @@ class EffectiveRuleset(object):
         # type: (str) -> Decimal
         return to_decimal(self._const("overtime.rates.{}".format(kind)),
                           "overtime.rates.{}".format(kind))
+
+    def overtime_standard_daily_hours(self):
+        # type: () -> Decimal
+        return to_decimal(self._const("overtime.standard_daily_hours"),
+                          "overtime.standard_daily_hours")
 
     def overtime_basis(self):
         # type: () -> list
@@ -235,6 +265,12 @@ class EffectiveRuleset(object):
     def double_wage_max_months(self):
         # type: () -> Decimal
         return to_decimal(self._const("double_wage.max_months"), "double_wage.max_months")
+
+    def double_wage_difference_multiple(self):
+        # type: () -> Decimal
+        """二倍工资**差额**倍数（已付一倍，另付差额 = 1 倍月工资）。"""
+        return to_decimal(self._const("double_wage.difference_multiple"),
+                          "double_wage.difference_multiple")
 
     def double_wage_basis(self):
         # type: () -> list
