@@ -83,8 +83,8 @@
 
 | 项 | 值 |
 |---|---|
-| **对账不变式** | **push 事件数 = CI run 数**（`gh run list --json event` 唯一值恒为 `push`）；唯一 head SHA 数 = push 事件数 − 1，因 `47415dc` 既有 main push 又有 tag push 两轮 |
-| 落盘时快照 | push 事件 **19** = run **19**（随每次回写提交 +1，故记不变式而非固定总数） |
+| **对账不变式** | **push 事件数 = CI run 数**（`gh run list --json event` 唯一值恒为 `push`，非 push 事件 run 数恒为 0）；唯一 head SHA 数 = push 事件数 − 1，因 `47415dc` 既有 main push 又有 tag push 两轮 |
+| 复核方式 | `gh run list --limit 60 --json event --jq '[.[]\|select(.event=="push")]\|length'` 与 `gh run list --limit 60 --json databaseId --jq 'length'` 两值相等。**不钉固定总数**——此后每次回写提交都会 +1（回写提交只动文档，CI 仍照跑作常驻闸门，故两值始终同步增长） |
 | 发布准备提交 | `167fe38` → run `38425953290`：三矩阵 **全 ✓ 225 passed** |
 | 新增步骤实测 | `release_assets.py selftest` → `RELEASE_ASSETS_SELFTEST_OK`；`dessensitize --mode messages`/`--mode history` → 两模式 `DESSENSITIZE_AUDIT_OK`（依赖 `fetch-depth: 0`） |
 | **首推终态提交失败并修复** | `edd9fcd` → run `38427285439` **三矩阵全红**：脱敏门抓到 `RELEASE-M6.md` 自身复述了字面路径形态（HARD `user_home_path`）→ 改为占位符表述，`--amend`（显式带 `GIT_COMMITTER_EMAIL`，防 committer 回落旧值）+ `--force-with-lease` 推送 |
