@@ -15,10 +15,10 @@
 | M2 | 经济补偿/赔偿金引擎（口径判定 + 三倍封顶 + 年限取整） | ✅ 完成 |
 | M3 | 加班费 / 年休假 / 二倍工资引擎 | ✅ 完成 |
 | M4 | 内置基准（口径判定 / 封顶取整边界 / 参数库自洽 / 边界自洽扫描 / 双向对账） | ✅ 完成 |
-| M5 | 桌面交付（PySide6 + PyInstaller + 报告导出 + 技术报告） | ⬜ |
+| M5 | 桌面交付（PySide6 多页签 + 报告导出 + PyInstaller 双 exe + 技术报告） | ✅ 完成 |
 | M6 | 脱敏发布 GitHub + Release | ⬜ |
 
-> 当前：**M4 基准完善**。北京/上海 × 2025/2026 四个坐标的社平工资、最低工资、法定节假日日历已逐条核对官方原文并置 `status=verified`；法定常数包（21 条）与条款库（17 条）全部 verified；合成雇佣档案真值库 406 条入仓。**四引擎**：经济补偿/赔偿金（N / N+1 / 2N + 三倍封顶 + 12 年上限 + 最低工资下限 + 代通知金）、加班费（日历四类联动 + 三档倍率 + 工时制度）、未休年休假折算（分档 + 当年度折算 + 向下取整 + 冲抵）、未签书面劳动合同二倍工资（起算 + 11 个月上限 + 逐月明细）——406 条真值记录**四模块全部对账 0 mismatch**。基准 **B1~B5 全部达标**：B4 由规则表推导全部切换端点（±0.01 邻域，不依赖真值库样本），B5 用公式推导与穷举恢复两条独立路径互验。
+> 当前：**M5 桌面交付**。北京/上海 × 2025/2026 四个坐标的社平工资、最低工资、法定节假日日历已逐条核对官方原文并置 `status=verified`；法定常数包（21 条）与条款库（17 条）全部 verified；合成雇佣档案真值库 406 条入仓。**四引擎**：经济补偿/赔偿金（N / N+1 / 2N + 三倍封顶 + 12 年上限 + 最低工资下限 + 代通知金）、加班费（日历四类联动 + 三档倍率 + 工时制度）、未休年休假折算（分档 + 当年度折算 + 向下取整 + 冲抵）、未签书面劳动合同二倍工资（起算 + 11 个月上限 + 逐月明细）——406 条真值记录**四模块全部对账 0 mismatch**。基准 **B1~B5 全部达标**（B4/B5 为规则驱动，不依赖真值库样本）。**桌面交付**：PySide6 多页签界面（四类计算 + 参数库 + 报告 + 依据），GUI 层零判定逻辑由 AST 断言守门；报告导出 Markdown + XLSX（同源渲染，含免责声明与参数来源块）；PyInstaller onedir 双 exe 经中立目录 + 最小环境 CLI 五连验证。
 
 ## 特性
 
@@ -28,6 +28,7 @@
 - **依据联动**：结论挂「法条条款 + 参数来源（哪年哪地社平工资 + 发布机关 + URL）」。
 - **未核对不生效**：`status` 门控单点，`pending` 条目一律拒绝进入计算路径。
 - **零政策字面量**：全部法定数值只能来自数据包；门禁脚本扫描引擎/基准/前端源码（含 docstring 与注释）。
+- **桌面 + CLI 双形态**：PySide6 多页签界面（四类计算 + 参数库 + 报告 + 依据）与 CLI 共用同一编排层，GUI 层零判定逻辑（AST 守门）；PyInstaller onedir 双 exe 经中立目录验证。
 - **全本地、零上传、零 LLM**：所有结论由确定性规则产生，无网络调用，无 API 依赖。
 
 ## 快速开始
@@ -50,6 +51,9 @@ python -m lcc doctor
 # 运行测试
 python -m pytest code/tests -q
 ```
+
+> GUI 相关测试需要 `PySide6`（`./code[gui]`）并在无显示环境下设 `QT_QPA_PLATFORM=offscreen`；
+> 未安装时这些用例会**跳过**（而非失败）。CI 显式装齐 `[dev,gui,report]`，确保它们真跑。
 
 > **`lcc` 命令**：`pip install -e ./code` 之后可直接用 `lcc params`；未安装时用 `PYTHONPATH=code/src python -m lcc params`。
 > **注意 `py` 启动器**：Windows 的 `py` 会绕过 venv 装到系统 Python —— venv 段落一律用 `python -m pip ...`。
@@ -74,6 +78,47 @@ python -m lcc calc --preview examples/sample-case.json
 
 > 默认四模块全跑即得四引擎结论；`--modules` 可只跑指定模块。
 
+### 桌面应用
+
+```bash
+# 安装 GUI 依赖（PySide6）
+py -X utf8 -m pip install -e "./code[gui]"
+
+# 启动桌面界面（四类计算 + 参数库 + 报告 + 适用依据，共 7 个页签）
+python -m lcc gui
+```
+
+界面只消费编排层 `lcc.pipeline` 的结果——**GUI 层零判定逻辑**由 `code/tests/test_gui_layer.py`
+的 AST 断言守门（不 import 引擎/参数库/门控、不含算术运算、不含政策数值）。演示截图见
+[`docs/demo/`](docs/demo/)（含页签截图与操作 GIF）。
+
+### 报告导出
+
+```bash
+# Markdown（stdlib，无需任何第三方依赖）
+python -m lcc report examples/sample-case.json --output report.md
+
+# XLSX（需 openpyxl，extra `report`；缺失时提示回退 Markdown）
+py -X utf8 -m pip install -e "./code[report]"
+python -m lcc report examples/sample-case.json --output report.xlsx
+```
+
+两种格式由**同一份章节结构**渲染，内容天然一致；均含输入事实、逐项计算过程、
+**参数来源块**（发布机关 + 年度 + 文号 + URL + 抓取日期）与免责声明。
+
+### 打包为 exe
+
+```bash
+# 需要 PyInstaller ≥ 6（PySide6 6.6 的字节码在 5.x 上无法解析）→ 用 3.12
+# 若要发布物支持 XLSX 导出，构建解释器还需装 openpyxl（否则 XLSX 通路走降级提示）
+py -3.12 -X utf8 -m pip install -e "./code[build,report]"
+py -3.12 -X utf8 tools/build_release.py            # 构建两个 exe 并自动验证
+```
+
+产物：`dist/lcc-cli/lcc.exe`（控制台）与 `dist/lcc-gui/lcc-gui.exe`（窗口）。
+验证方式是把 onedir 目录复制到**中立目录**、用**最小环境**跑 CLI 五连
+（`--preview` 期望 exit 1），详见 `tools/verify_package.py`。
+
 ## 目录结构
 
 ```
@@ -85,17 +130,21 @@ data/
   regions/      地区主数据（行政区划码 + 社平工资口径登记）
   truth/        合成雇佣档案 + 真值库（M1 起）
 code/
-  src/lcc/      核心包（params/gate/law/model/pipeline/engine/cli/report/gui）
+  src/lcc/      核心包（params/gate/law/model/pipeline/engine/cli/report/gui/packaging）
   tests/        测试
-tools/          生成器 / 门禁 / 审计脚本
-docs/           技术报告与演示素材
+tools/          生成器 / 门禁 / 基准 / 审计 / 打包 / 演示素材脚本
+docs/           技术报告（技术报告.md）与演示素材（demo/）
 ```
+
+**分层依赖单向向下**：表现层（`gui/`、`cli.py`、`report/`）→ 编排层（`pipeline`，唯一编排源）
+→ 引擎层 → 规则层 → 数据层。核心层（引擎/规则/编排/Markdown 报告）**零第三方依赖**；
+可选依赖（PySide6 / openpyxl）只允许出现在守卫式惰性导入里。三条约束都有 AST 守门测试。
 
 ## 评测指标
 
-基准脚本 `tools/bench.py`（全离线、单次全量 < 1 秒）：退出码 0 达标 / 1 未达标 / 2 用法错误。**当前 M4 实测全达标**。
+基准脚本 `tools/bench.py`（全离线、单次全量 < 1 秒）：退出码 0 达标 / 1 未达标 / 2 用法错误。**当前全量达标**。
 
-| 基准 | 内容 | 目标 | 现状（M4 实测） |
+| 基准 | 内容 | 目标 | 现状 |
 |---|---|---|---|
 | B1 口径判定 | 解除情形 → N/N+1/2N/none（含易混边界） | 100% | ✅ **9/9 = 100%** |
 | B2 边界与全模块对账 | 真值库全量经**四引擎**重算（三倍 ±0.01、6 个月临界、12 年上限、余日 0/14/15 天、日历四类倍率、年休假分档与向下取整、二倍工资起算与 11 个月上限） | 全通过 | ✅ **406/406** |
@@ -109,6 +158,24 @@ docs/           技术报告与演示素材
 > **B4/B5 非空验**：测试内用阳性对照注入语义漂移（封顶 `>`→`>=`、年限阈值 `>=`→`>`、年休假分档下界、二倍工资首月）并断言基准**必须报失败**——`code/tests/test_bench.py` 的 `test_b4_detects_cap_switch_drift` / `test_b5_detects_year_rounding_drift` 守门。
 
 **四引擎算例回归（M3-4）**：`data/truth/` 406 条记录经四引擎重算后，与真值语义（`lcc.benchmark.cases`，M1 冻结产物）逐字段 + 隐含结论对账 **0 mismatch**（两实现独立，`code/tests/test_truth_library.py` 的 `test_severance_engine_reconciles_all_truth_cases` / `test_m3_engines_reconcile_all_truth_cases` 守门）。
+
+### M5 桌面交付验证
+
+| 项 | 验收方式 | 现状 |
+|---|---|---|
+| GUI 零判定逻辑 | AST 断言：不 import 引擎/参数库/门控、无算术运算、无政策数值 | ✅ `code/tests/test_gui_layer.py` |
+| GUI offscreen 冒烟 | offscreen 平台构造真实窗口 + 触发计算 + 导出报告 | ✅ `tools/gui_smoke.py`（CI 独立步骤） |
+| 编排一致性 | CLI 输出 = pipeline 直调 = 报告章节，同一输入逐字段一致 | ✅ `code/tests/test_pipeline_orchestration.py` |
+| 报告两格式一致 | Markdown 与 XLSX 消费同一章节结构（单一渲染源） | ✅ `test_xlsx_report_matches_markdown_content` |
+| 导出可复现 | 同一输入两次导出 XLSX **逐字节一致**（归一化 openpyxl 写盘时间戳与 zip 元数据） | ✅ `test_xlsx_export_is_byte_reproducible` |
+| 双 exe 中立目录验证 | 复制到临时中立目录 + 最小环境跑 **CLI 五连 + 报告导出**（含 `--preview` exit 1） | ✅ `tools/verify_package.py` → `PACKAGE_VERIFY_OK` |
+| datas 白名单单一源 | 两个 spec 均调 `lcc.packaging.build_datas()`，不内联清单 | ✅ `code/tests/test_packaging.py` |
+| 演示素材可复现 | 两次独立生成的 9 个文件 sha256 全部一致 | ✅ `tools/make_demo_assets.py` |
+
+**测试规模**：214 个用例（Python 3.8.8 与 3.12.10 双解释器均实跑；3.12 未装 `openpyxl` 时两个 XLSX 用例正确跳过）。
+
+技术报告（架构 / 口径判定规则化 / 参数库版本化 / 基准体系 / 桌面交付 / 验证体系）见
+[`docs/技术报告.md`](docs/技术报告.md)。
 
 ## 限制与边界
 

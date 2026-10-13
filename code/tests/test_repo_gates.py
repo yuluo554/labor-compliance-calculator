@@ -82,17 +82,20 @@ def _stdlib_names():
 def test_core_layer_has_no_third_party_imports():
     """核心层零第三方依赖（D-09）。
 
-    适用范围 = 引擎/规则/编排层（engine、params、gate、law、model、pipeline、
-    decimalutil、data_paths、errors、_stdio、report）。这些模块只允许 stdlib 与
-    lcc 内部。
+    适用范围 = 引擎/规则/编排/报告（Markdown 通路）层（engine、params、gate、law、
+    model、pipeline、decimalutil、data_paths、errors、_stdio、report），以及
+    benchmark 真值语义。这些模块只允许 stdlib 与 lcc 内部。
 
-    ``cli.py`` 与 ``gui/`` 属表现层，**允许**惰性探测可选依赖（如 PySide6），
-    但必须满足"函数内 + try/except ImportError 守卫"——由下面两个独立断言约束。
+    表现层——``cli.py``、``gui/``、``report/xlsx.py``——**允许**惰性探测可选依赖
+    （PySide6 / openpyxl），但必须满足"函数内 + try/except ImportError 守卫"，
+    由 :func:`test_presentation_optional_deps_are_lazy_and_guarded` 约束。
     """
     stdlib = _stdlib_names()
     core_files = [
         path for path in _py_files(SRC)
-        if os.sep + "gui" + os.sep not in path and os.path.basename(path) != "cli.py"
+        if os.sep + "gui" + os.sep not in path
+        and os.path.basename(path) != "cli.py"
+        and os.path.basename(path) != "xlsx.py"
     ]
     offenders = []
     for path in core_files:
@@ -157,12 +160,32 @@ def test_cli_optional_deps_are_lazy_and_guarded():
 
     这是 D-13「GUI 惰性导入」的可执行断言：模块级 import PySide6 会让
     ``import lcc.cli`` 在无 GUI 依赖的机器上直接崩，且 CLI 其它子命令也一起不可用。
+    M5 起 GUI 实装在 ``lcc.gui.app``（``cli.py`` 只是转发到 ``gui.app.run``），
+    故两个表现层文件一起断言。
     """
-    cli_path = os.path.join(SRC, "cli.py")
-    unguarded, guarded = _guarded_lazy_imports(cli_path)
-    assert not unguarded, "cli.py 出现模块级第三方 import（必须惰性+守卫）: {}".format(unguarded)
-    guarded_names = {name for name, _lineno in guarded}
-    assert "PySide6" in guarded_names, "cli.py 应仅在 cmd_gui 内守卫式惰性导入 PySide6"
+    for relative in ("cli.py", os.path.join("gui", "app.py")):
+        path = os.path.join(SRC, relative)
+        unguarded, guarded = _guarded_lazy_imports(path)
+        assert not unguarded, "{} 出现模块级第三方 import（必须惰性+守卫）: {}".format(
+            relative, unguarded)
+    _unguarded, guarded = _guarded_lazy_imports(os.path.join(SRC, "gui", "app.py"))
+    assert "PySide6" in {name for name, _lineno in guarded}, \
+        "gui/app.py 应仅在守卫式惰性导入中引用 PySide6"
+
+
+def test_presentation_optional_deps_are_lazy_and_guarded():
+    """可选依赖（PySide6 / openpyxl）只允许出现在守卫式惰性导入里。
+
+    `cli.py` 与 `gui/` 的表现层代码不得模块级 import 第三方；`report/xlsx.py`
+    是 XLSX 通路的唯一可选依赖边界，同样只能惰性+守卫。
+    """
+    offenders = []
+    for relative in ("cli.py", os.path.join("gui", "app.py"), os.path.join("report", "xlsx.py")):
+        path = os.path.join(SRC, relative)
+        unguarded, _guarded = _guarded_lazy_imports(path)
+        if unguarded:
+            offenders.append((relative, unguarded))
+    assert not offenders, "表现层出现模块级第三方 import: {}".format(offenders)
 
 
 # ---- 零政策字面量门禁（NFR-4 / D-12） -------------------------------------

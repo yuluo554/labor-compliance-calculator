@@ -181,13 +181,6 @@ def test_calc_accepts_truth_record_input(data_dir, tmp_path):
     assert cli.main(["--data-dir", data_dir, "calc", "--preview", str(path)]) == EXIT_DEGRADED
 
 
-def test_gui_with_pyside_reports_milestone(data_dir, capsys):
-    """PySide6 就绪时：M0 阶段明确报里程碑（exit 1），不静默起空窗口。"""
-    pytest.importorskip("PySide6")
-    assert cli.main(["--data-dir", data_dir, "gui"]) == EXIT_DEGRADED
-    assert "M5" in capsys.readouterr().err
-
-
 def test_gui_without_pyside_returns_input_error(data_dir, capsys, monkeypatch):
     """PySide6 缺失时：打印安装提示并 exit 2（不崩溃）。"""
     import builtins

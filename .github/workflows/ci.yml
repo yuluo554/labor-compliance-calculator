@@ -21,6 +21,9 @@ jobs:
             python-version: "3.12"
           - os: windows-latest
             python-version: "3.8"
+    env:
+      # GUI 测试与演示素材生成走 offscreen 平台（无显示环境必需）
+      QT_QPA_PLATFORM: offscreen
     steps:
       - name: Checkout (full history)
         uses: actions/checkout@v4
@@ -32,15 +35,25 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Qt system libraries (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libxkbcommon-x11-0 libxcb-cursor0
+
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
 
-      - name: Install (dev extras)
-        run: python -m pip install -e "./code[dev]"
+      - name: Install (dev + gui + report extras)
+        # GUI 测试不装 PySide6 会静默跳过（假绿）；openpyxl 同理。
+        # 故 CI 显式装齐，让 M5 的三类守门（GUI 零判定逻辑 / offscreen 冒烟 / XLSX 一致）真跑。
+        run: python -m pip install -e "./code[dev,gui,report]"
 
       - name: Environment probe
         run: |
           python -c "import sys; print(sys.version)"
+          python -c "import PySide6; print('PySide6', PySide6.__version__)"
+          python -c "import openpyxl; print('openpyxl', openpyxl.__version__)"
 
       - name: Repo gates (literals / frozen rulesets / frozen truth / dessensitize)
         run: |
@@ -61,5 +74,18 @@ jobs:
           python -m lcc doctor
           python -m lcc calc examples/sample-case.json --modules severance
           python -m lcc calc examples/sample-case.json
+        env:
+          PYTHONPATH: code/src
+
+      - name: Report export smoke (Markdown + XLSX)
+        run: |
+          python -m lcc report examples/sample-case.json --output .ci-report/report.md
+          python -m lcc report examples/sample-case.json --output .ci-report/report.xlsx
+        env:
+          PYTHONPATH: code/src
+
+      - name: GUI offscreen smoke
+        # 真实构造窗口并触发计算（不是"能 import"）——M5-2 的可执行证据。
+        run: python tools/gui_smoke.py
         env:
           PYTHONPATH: code/src

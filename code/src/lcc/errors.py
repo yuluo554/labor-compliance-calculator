@@ -78,6 +78,16 @@ class NotImplementedYet(LccError):
     exit_code = EXIT_DEGRADED
 
 
+class OptionalDependencyError(LccError):
+    """可选依赖缺失（如 XLSX 导出需要 ``openpyxl``）。
+
+    按降级语义给 exit 1：调用方应回退到不依赖该依赖的通路（Markdown）并提示，
+    而不是崩溃或静默产出半成品。
+    """
+
+    exit_code = EXIT_DEGRADED
+
+
 __all__ = [
     "EXIT_OK",
     "EXIT_DEGRADED",
@@ -90,4 +100,5 @@ __all__ = [
     "LawBasisError",
     "ComputationError",
     "NotImplementedYet",
+    "OptionalDependencyError",
 ]

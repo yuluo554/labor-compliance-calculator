@@ -17,6 +17,8 @@ dist/
 *.sqlite
 output/
 reports/
+.ci-report/
+.scratch/
 *.log
 
 # 环境与密钥
