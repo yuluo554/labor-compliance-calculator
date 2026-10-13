@@ -49,7 +49,7 @@ jobs:
           python tools/gen_cases.py --check
           python tools/dessensitize_audit.py --mode tracked
 
-      - name: Benchmarks (B1 / B2 / B3)
+      - name: Benchmarks (B1 / B2 / B3 / B4 / B5)
         run: python tools/bench.py
 
       - name: Run tests
