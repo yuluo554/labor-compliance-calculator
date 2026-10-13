@@ -29,13 +29,20 @@
 | GUI / 报告 | `code/src/lcc/gui/`、`report/` | 🔄 M5 实现（惰性导入已就位） |
 | 数据包 | `data/rules`(8) / `constants`(18 条) / `law`(16 条) / `regions`(4) | ✅ 结构入仓，**全 pending** |
 | 生成器/门禁/审计 | `tools/gen_rulesets.py`、`check_no_literals.py`、`dessensitize_audit.py` | ✅ |
-| 测试 | `code/tests/` 7 个模块 | ✅ **77 passed**（本机 3.8.8 与 3.12.10 双验） |
+| 测试 | `code/tests/` 7 个模块 | ✅ **78 passed**（本机 3.8.8 与 3.12.10 双验） |
 | CI | `.github/workflows/ci.yml` | ✅ 三矩阵（ubuntu/3.12、windows/3.12、windows/3.8） |
 
 **验证证据（M0 收尾实跑）**：
-- 本机 `py -3.8` 与 `py -3.12` 干净 venv：`pip install -e "./code[dev]"` 成功；`pytest code/tests` → **77 passed**，收集数 77（两版本一致）。
-- 门禁三连：`NO_POLICY_LITERALS_OK` / `FROZEN_RULESETS_OK` / `DESSENSITIZE_AUDIT_OK`。
+- 本机 `py -3.8` 与 `py -3.12` 干净 venv：`pip install -e "./code[dev]"` 成功；`pytest code/tests` → **78 passed**，收集数 78（两版本一致）。
+- 门禁：`NO_POLICY_LITERALS_OK`（8 文件 0 命中）/ `FROZEN_RULESETS_OK` / `DESSENSITIZE_AUDIT_OK`（tracked + messages + history 三模式）。
 - CLI 冒烟：`params` exit 0；`doctor` exit 0；`calc examples/sample-case.json` **exit 2**（门控拦截，预期）；`calc --preview` **exit 1**（引擎待 M2，预期）。
+- 打包元数据：`python -m build code` 成功，wheel 元数据已验（Name/Version/License/Requires-Python/四个 extras 齐全，long_description 1557 字符）。
+- **提交元数据邮箱已改写**：原 `<旧个人邮箱已占位化>` → `<id>+<user>@users.noreply.github.com`（用 `filter-branch --env-filter` + reflog expire + gc）；三个提交的 `%ae`/`%ce` 均为 noreply，全历史 grep 旧值 = 0，`git fsck` 0 错误。**改写发生在建仓之前（零成本窗口，无 force-push）**。备份 bundle 在仓库外 `../lcc-backup-pre-m0.bundle`（验证完成后可删）。
+
+**M0 收尾发现并修复的两个真实缺陷（都由自家守门测试抓出，非人工目检）**：
+1. `code/pyproject.toml` 的 `readme = "README.md"` 相对 `code/` 解析，指向不存在的文件 → sdist 告警 "README.md cannot be found"。已新增 `code/README.md`（指向仓库根说明）。
+2. 脱敏审计器把**正则模式**误当**字面子串**存进豁免表 → SSH 克隆 URL（`git@github.com:...`）被误判为个人邮箱硬门。已改为字面匹配，并补两条测试（克隆 URL 两形态豁免 / hex 数字段不误报）。
+   > 附注：测试夹具里连续 11 位数字段会被审计器扫自己命中 → 夹具改为**运行时拼接**（源码不留完整字面量）。
 
 ---
 
@@ -96,7 +103,7 @@
 | M0-8 | 退出码 0/1/2 锁进测试 | ✅ | `test_cli_exit_codes.py` 15 项 |
 | M0-9 | 数据包初始化（全 pending） | ✅ | 8 规则包 + 18 常数 + 16 条款 + 4 地区 |
 | M0-10 | 零政策字面量门禁可跑 | ✅ | `NO_POLICY_LITERALS_OK`（8 文件 0 命中） |
-| M0-11 | 全量 pytest 通过 | ✅ | 77 passed（3.8.8 与 3.12.10 双验） |
+| M0-11 | 全量 pytest 通过 | ✅ | 78 passed（3.8.8 与 3.12.10 双验） |
 | M0-12 | CI 多矩阵 | 🔄 | workflow 已入仓 + 解析/接线守门测试通过；**尚未推送，CI 首跑待建仓后验证** |
 | M0-13 | README 含简介/状态/快速开始/目录/免责 | ✅ | `README.md` |
 | M0-14 | `plan/HANDOFF-M1.md` 落盘 | ✅ | 本文件 |
