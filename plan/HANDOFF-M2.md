@@ -50,9 +50,18 @@ $ lcc calc <440000/2026 同结构输入>    → exit 2，stderr「门控拦截�
 ### 1.4 验证证据（M1 收尾实跑）
 
 - 全量 pytest：**96 passed**（本机 3.8.8 与 3.12.10 双验，收集数一致）。
-- 四道门禁：`NO_POLICY_LITERALS_OK`（11 文件 0 命中）/ `FROZEN_RULESETS_OK` / `FROZEN_TRUTH_OK` / `DESSENSITIZE_AUDIT_OK`。
+- 四道门禁：`NO_POLICY_LITERALS_OK`（11 文件 0 命中）/ `FROZEN_RULESETS_OK` / `FROZEN_TRUTH_OK` / `DESSENSITIZE_AUDIT_OK`（tracked + messages + history 三模式全过）。
 - CLI 冒烟：`params` / `doctor` exit 0；已核对坐标 exit 1（进引擎）；未核对坐标 exit 2（门控）。
 - 真值库：406 条全部可由 `cases.evaluate` 独立重算对上（`test_stored_truth_recomputes_from_single_source`）。
+
+### 1.5 建仓与 CI（**M0-12 闭环**）
+
+- 仓库已建：`yuluo554/labor-compliance-calculator`（public）；远端为 SSH 形态（`git@github.com:...`，不受 OAuth `workflow` scope 限制）。
+- 建仓方式按 D-24：`gh repo create ... --source . --remote origin`（**不带 `--push`**）→ `git remote set-url origin git@...` → `git push -u origin main` 一次成。
+- **CI 首跑全绿**（run `38386506901`）：三矩阵 `ubuntu-latest/py3.12` + `windows-latest/py3.12` + `windows-latest/py3.8` 全部 ✓；workflow 内「Repo gates（literals / frozen rulesets / dessensitize）」「Run tests」「CLI smoke」各步均 ✓。
+- **push 数 = run 数**：本地既有 8 个提交在**首次 push** 一次性上传 → 触发 1 个 workflow run（GitHub 按 push 事件计，不按提交数计）→ 1 run，对账成立。
+- 说明：CI 日志有 Node.js 20 弃用提示与 ubuntu 镜像迁移预告（actions 版本层面，非本项目失败）；后续升级 actions 版本时可一并处理。
+- 全历史脱敏：`--mode messages` 与 `--mode history` 均 `DESSENSITIZE_AUDIT_OK`（提交信息与全历史无敏感命中）。
 
 ---
 
@@ -141,9 +150,7 @@ M1 真值语义取**劳动者月工资**（12 个月平均，不低于当地最�
 
 ## 六、下一步第一件事（M2 启动前）
 
-1. **建仓并接 CI（若尚未完成）**（D-24，M0-12 遗留）：
-   `gh repo create yuluo554/labor-compliance-calculator --public --description "..." --source . --remote origin`（**不带 `--push`**）→ `git remote set-url origin git@github.com:yuluo554/labor-compliance-calculator.git` → push 一次成（SSH 不受 OAuth scope 限制）。
-   首推后 `gh run list` 对账 push 数 = run 数；三矩阵首跑绿。
+1. **建仓并接 CI**：✅ **已完成**（见 §1.5）——仓库已建、CI 首跑三矩阵全绿、全历史脱敏通过。
 2. 然后进入 M2：先实现 `engine/severance.py`，每实现一块就跑 `cases-pilot/boundary` 的 `severance` 对账（`benchmark.cases.compare`）。
 3. M2 收尾跑基准 B1（口径判定 100%）并把指标写进 README 评测表。
 

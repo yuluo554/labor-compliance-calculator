@@ -158,11 +158,20 @@ def test_compare_reports_mismatch_on_tampered_value(data_dir):
 # ---- 输入可被模型接受（D-18：文档说的输入必须真能跑） ----------------------
 
 def test_every_case_input_facts_parse(data_dir):
+    """每条 ``input_facts`` 都能被模型接受（D-18：文档说的输入必须真能跑）。
+
+    断言带上 case_id —— 失败时直接定位到具体记录，而非只报"某条不合法"。
+    """
     for case in _all_cases(data_dir):
-        parsed = CaseInput.from_dict(case["input_facts"])
-        assert parsed.employment.region_code
-        assert parsed.employment.monthly_wages
-        assert parsed.termination is not None
+        try:
+            parsed = CaseInput.from_dict(case["input_facts"])
+        except Exception as exc:  # noqa: BLE001 - 需带 case_id 上报
+            raise AssertionError(
+                "{}: input_facts 无法解析: {}".format(case["case_id"], exc)
+            )
+        assert parsed.employment.region_code, case["case_id"]
+        assert parsed.employment.monthly_wages, case["case_id"]
+        assert parsed.termination is not None, case["case_id"]
 
 
 def test_truth_cases_use_only_verified_coordinates(data_dir):
