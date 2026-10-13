@@ -441,3 +441,74 @@ def test_dessensitize_audit_whitelists_clone_urls(repo_root):
     text = "{}\n{}\n".format(ssh_line, https_line)
     hard, _review = module._scan_text(text, "clone-urls")
     assert hard == [], hard
+
+
+# ---- 发布期：历史/提交信息扫描 + 提交元数据邮箱（M6-1） --------------------
+
+def _has_git_history(repo_root):
+    if not os.path.isdir(os.path.join(repo_root, ".git")):
+        return False
+    try:
+        out = subprocess.check_output(["git", "rev-list", "--all", "-n", "1"],
+                                      cwd=repo_root, stderr=subprocess.DEVNULL)
+    except (subprocess.CalledProcessError, OSError):
+        return False
+    return bool(out.strip())
+
+
+def test_dessensitize_audit_history_passes(repo_root):
+    """全历史扫描 0 硬门命中（CI 靠 fetch-depth: 0 才有全量历史）。"""
+    if not _has_git_history(repo_root):
+        pytest.skip("无 git 历史（导出树），历史扫描跳过")
+    result = subprocess.run(
+        [sys.executable, os.path.join(repo_root, "tools", "dessensitize_audit.py"),
+         "--mode", "history"],
+        cwd=repo_root, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+    )
+    output = result.stdout.decode("utf-8", "replace")
+    assert result.returncode == 0, output
+    assert "DESSENSITIZE_AUDIT_OK" in output
+
+
+def test_dessensitize_audit_messages_passes(repo_root):
+    """提交信息扫描 0 硬门命中。"""
+    if not _has_git_history(repo_root):
+        pytest.skip("无 git 历史（导出树），提交信息扫描跳过")
+    result = subprocess.run(
+        [sys.executable, os.path.join(repo_root, "tools", "dessensitize_audit.py"),
+         "--mode", "messages"],
+        cwd=repo_root, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+    )
+    output = result.stdout.decode("utf-8", "replace")
+    assert result.returncode == 0, output
+    assert "DESSENSITIZE_AUDIT_OK" in output
+
+
+def test_history_scan_channel_is_alive(repo_root):
+    """历史扫描通道探活：防 `git grep` 多 rev 静默空扫造成的"全历史干净"假绿。
+
+    阳性对照：把必然存在的提交标题片段喂给同一扫描通道，必须搜得到。
+    """
+    if not _has_git_history(repo_root):
+        pytest.skip("无 git 历史（导出树），探活断言跳过")
+    out = subprocess.check_output(
+        ["git", "log", "--all", "--format=%s", "-n", "5"], cwd=repo_root
+    ).decode("utf-8", "replace")
+    assert out.strip(), "历史通道无输出 → 全历史扫描是空验"
+
+
+def test_commit_metadata_emails_are_noreply(repo_root):
+    """提交元数据邮箱检查（内容级扫描覆盖不到的盲区）：不得留真实个人邮箱。
+
+    全历史作者的 ae 与 ce 两个字段都要查——只查一个会让"改了一半"蒙混过关。
+    """
+    if not _has_git_history(repo_root):
+        pytest.skip("无 git 历史（导出树），元数据检查跳过")
+    out = subprocess.check_output(
+        ["git", "log", "--all", "--format=%ae%n%ce"], cwd=repo_root
+    ).decode("utf-8", "replace")
+    emails = {line.strip().lower() for line in out.splitlines() if line.strip()}
+    assert emails, "未读到任何提交邮箱 → 检查是空验"
+    allowed_domains = ("users.noreply.github.com",)
+    offenders = [e for e in emails if not e.endswith(allowed_domains)]
+    assert not offenders, "存在非 noreply 提交邮箱: {}".format(sorted(offenders))

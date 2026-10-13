@@ -61,6 +61,13 @@ jobs:
           python tools/gen_rulesets.py --check
           python tools/gen_cases.py --check
           python tools/dessensitize_audit.py --mode tracked
+          python tools/release_assets.py selftest
+
+      - name: Desensitize full-history scan
+        # 依赖 fetch-depth: 0 的全量历史；release 门禁的一部分（M6-1）。
+        run: |
+          python tools/dessensitize_audit.py --mode messages
+          python tools/dessensitize_audit.py --mode history
 
       - name: Benchmarks (B1 / B2 / B3 / B4 / B5)
         run: python tools/bench.py
