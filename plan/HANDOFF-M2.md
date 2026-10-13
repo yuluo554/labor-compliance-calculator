@@ -58,8 +58,8 @@ $ lcc calc <440000/2026 同结构输入>    → exit 2，stderr「门控拦截�
 
 - 仓库已建：`yuluo554/labor-compliance-calculator`（public）；远端为 SSH 形态（`git@github.com:...`，不受 OAuth `workflow` scope 限制）。
 - 建仓方式按 D-24：`gh repo create ... --source . --remote origin`（**不带 `--push`**）→ `git remote set-url origin git@...` → `git push -u origin main` 一次成。
-- **CI 首跑全绿**（run `38386506901`）：三矩阵 `ubuntu-latest/py3.12` + `windows-latest/py3.12` + `windows-latest/py3.8` 全部 ✓；workflow 内「Repo gates（literals / frozen rulesets / dessensitize）」「Run tests」「CLI smoke」各步均 ✓。
-- **push 数 = run 数**：本地既有 8 个提交在**首次 push** 一次性上传 → 触发 1 个 workflow run（GitHub 按 push 事件计，不按提交数计）→ 1 run，对账成立。
+- **CI 首跑全绿**（run `38386506901`）：三矩阵 `ubuntu-latest/py3.12` + `windows-latest/py3.12` + `windows-latest/py3.8` 全部 ✓；workflow 内「Repo gates（literals / frozen rulesets / dessensitize）」「Run tests」「CLI smoke」各步均 ✓。第二次 push 亦全绿（run `38387380042`）。
+- **push 事件数 = run 数**：本地既有 8 个提交在**首次 push** 一次性上传 → 触发 1 个 workflow run（GitHub 按 **push 事件**计，不按提交数计）；M1 回写 push 触发第 2 run → 2 push = 2 run，对账成立。（`git rev-list --count` 数的是提交数，不是 push 数，勿混用。）
 - 说明：CI 日志有 Node.js 20 弃用提示与 ubuntu 镜像迁移预告（actions 版本层面，非本项目失败）；后续升级 actions 版本时可一并处理。
 - 全历史脱敏：`--mode messages` 与 `--mode history` 均 `DESSENSITIZE_AUDIT_OK`（提交信息与全历史无敏感命中）。
 
