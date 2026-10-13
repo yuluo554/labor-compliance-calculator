@@ -139,16 +139,23 @@ PACKAGE_VERIFY_OK
 
 ### 1.9 验证证据（M5 收尾实跑）
 
-- 全量 pytest：**214 用例**（收集数）；**3.12 全量 212 passed + 2 skipped**（skip 为未装
-  openpyxl，属预期）；**3.8 分批逐文件全通过**（14 个测试文件；全量单次偶发退出期 segfault 139）。
+- 全量 pytest：**214 用例**；**3.12 全量 214 passed**（装齐 `[dev,gui,report]` 后无跳过）；
+  **3.8 分批逐文件全通过**（14 个测试文件，214 passed；全量单次偶发退出期 segfault 139）。
 - 五道门禁：`NO_POLICY_LITERALS_OK`（11 文件 0 命中）/ `FROZEN_RULESETS_OK` /
-  `FROZEN_TRUTH_OK` / `DESSENSITIZE_AUDIT_OK`（tracked）。
+  `FROZEN_TRUTH_OK` / `DESSENSITIZE_AUDIT_OK`（tracked + messages）。
 - 基准全达标：B1 9/9、B2 406/406、B3 5/5、B4 96/96、B5 40/40、阳性对照 4/4。
 - CLI 冒烟：`params` / `doctor` / `calc --modules severance` / `calc`（四模块）exit 0；
-  `calc --preview` exit 1。
+  `calc --preview` exit 1；`report`（md + xlsx）exit 0。
 - GUI offscreen 冒烟：7 页签齐备、四模块页签有内容、报告页签含免责声明、两种格式导出成功。
-- 打包验证：`PACKAGE_VERIFY_OK`（见 §1.4）。
-- 素材可复现：9 文件 sha256 两次一致；XLSX 导出 sha256 两次一致。
+- 打包验证：`BUILD_RELEASE_OK` / `PACKAGE_VERIFY_OK`（见 §1.4）。
+- 素材可复现：9 文件 sha256 两次一致；报告导出（源码态与**冻结 exe**）sha256 两次一致。
+
+### 1.10 CI
+
+- M5 提交 `cafbeae` 推送 `origin/main` → **CI 全绿**（run `38421293103`）：三矩阵
+  `ubuntu-latest/py3.12` + `windows-latest/py3.12` + `windows-latest/py3.8` 全部 ✓，
+  12 步含新增的 **Report export smoke (Markdown + XLSX)** 与 **GUI offscreen smoke**。
+- 说明：CI 日志仍有 Node.js 20 弃用提示与 ubuntu 镜像迁移预告（actions 版本层面，非本项目失败）。
 
 ---
 

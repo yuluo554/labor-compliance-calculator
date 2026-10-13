@@ -64,16 +64,29 @@ GIF_NAME = "demo.gif"
 GIF_FRAME_MS = 1400
 GIF_SIZE = (1024, 820)
 
-# 候选系统 CJK 字体（offscreen 平台不会自动扫描系统字体目录，中文会渲染成豆腐块）
-_CJK_FONT_CANDIDATES = (
-    r"C:\Windows\Fonts\msyh.ttc",       # Microsoft YaHei
-    r"C:\Windows\Fonts\msyhbd.ttc",
-    r"C:\Windows\Fonts\simhei.ttf",     # 黑体
-    r"C:\Windows\Fonts\simsun.ttc",     # 宋体
+# 候选系统 CJK 字体（offscreen 平台不会自动扫描系统字体目录，中文会渲染成豆腐块）。
+# Windows 侧由 ``WINDIR``/``SystemRoot`` 环境变量推导字体目录——避免在源码里写死
+# 绝对盘符路径（脱敏审计会把它当"其他盘路径"复核项，且换机即失效）。
+_WINDOWS_FONT_FILES = ("msyh.ttc", "msyhbd.ttc", "simhei.ttf", "simsun.ttc")
+_POSIX_FONT_PATHS = (
     "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
     "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
     "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
+    "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
 )
+
+
+def _cjk_font_candidates():
+    # type: () -> list
+    """候选字体绝对路径：Windows 由系统目录环境变量推导，POSIX 用常见发行版路径。"""
+    candidates = []
+    for variable in ("WINDIR", "SystemRoot"):
+        root = os.environ.get(variable)
+        if root:
+            for name in _WINDOWS_FONT_FILES:
+                candidates.append(os.path.join(root, "Fonts", name))
+    candidates.extend(_POSIX_FONT_PATHS)
+    return candidates
 
 
 def _require_pyside():
@@ -97,7 +110,7 @@ def _install_cjk_font(QtGui, QtWidgets):
     offscreen 平台下 Qt 找不到系统字体目录（Qt 6 起不再随附字体），中文会渲染成
     豆腐块——Demo 素材必须可读，故此处按候选路径显式加载。
     """
-    for path in _CJK_FONT_CANDIDATES:
+    for path in _cjk_font_candidates():
         if not os.path.isfile(path):
             continue
         font_id = QtGui.QFontDatabase.addApplicationFont(path)

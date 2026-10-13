@@ -172,7 +172,7 @@ docs/           技术报告（技术报告.md）与演示素材（demo/）
 | datas 白名单单一源 | 两个 spec 均调 `lcc.packaging.build_datas()`，不内联清单 | ✅ `code/tests/test_packaging.py` |
 | 演示素材可复现 | 两次独立生成的 9 个文件 sha256 全部一致 | ✅ `tools/make_demo_assets.py` |
 
-**测试规模**：214 个用例（Python 3.8.8 与 3.12.10 双解释器均实跑；3.12 未装 `openpyxl` 时两个 XLSX 用例正确跳过）。
+**测试规模**：214 个用例（Python 3.8.8 与 3.12.10 双解释器均实跑全通过；3.8 本机全量单次偶发退出期 segfault，按既定做法分批逐文件确认）。
 
 技术报告（架构 / 口径判定规则化 / 参数库版本化 / 基准体系 / 桌面交付 / 验证体系）见
 [`docs/技术报告.md`](docs/技术报告.md)。
