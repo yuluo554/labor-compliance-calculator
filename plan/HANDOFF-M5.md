@@ -86,8 +86,12 @@ $ py -X utf8 tools/bench.py
 
 ### 1.7 CI
 
-- M4 提交推送 `origin/main` → **CI 全绿**（run 见 §一.7 回写行）：三矩阵
-  `ubuntu-latest/py3.12` + `windows-latest/py3.12` + `windows-latest/py3.8` 全部 ✓。
+- M4 提交 `9d414ec` 推送 `origin/main` → **CI 全绿**（run `38411112282`）：三矩阵
+  `ubuntu-latest/py3.12`（22s）+ `windows-latest/py3.12`（33s）+ `windows-latest/py3.8`（1m13s）全部 ✓。
+  workflow 步骤：Repo gates（literals / frozen rulesets / frozen truth / dessensitize）、
+  **Benchmarks (B1/B2/B3/B4/B5)**、Run tests、CLI smoke（含 `python -m lcc calc examples/sample-case.json`
+  默认四模块）各步均 ✓。
+- 说明：CI 日志仍有 Node.js 20 弃用提示与 ubuntu 镜像迁移预告（actions 版本层面，非本项目失败）。
 
 ---
 
