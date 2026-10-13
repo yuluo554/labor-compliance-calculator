@@ -20,6 +20,9 @@ import pytest
 
 from lcc.benchmark import cases as truth
 from lcc.benchmark.rng import SplitMix64
+from lcc.engine import annual_leave as _annual_leave
+from lcc.engine import double_wage as _double_wage
+from lcc.engine import overtime as _overtime
 from lcc.gate import effective_ruleset
 from lcc.model import CaseInput
 from lcc.params import load_constants, load_ruleset
@@ -194,6 +197,53 @@ def test_severance_engine_basis_ids_all_resolvable(data_dir):
         output = severance.compute(parsed.employment, parsed.termination, ruleset)
         missing = [item for item in output["basis"] if not library.has(item)]
         assert not missing, (case["case_id"], missing)
+
+
+# ---- M3-4：加班费/年休假/二倍工资三引擎对全量真值库回归（100% 对账） -------
+
+_M3_ENGINES = {
+    "overtime": lambda parsed, ruleset: _overtime.compute(parsed.employment, ruleset),
+    "annual_leave": lambda parsed, ruleset: _annual_leave.compute(parsed.employment, ruleset),
+    "double_wage": lambda parsed, ruleset: _double_wage.compute(parsed.employment, ruleset),
+}
+
+
+def test_m3_engines_reconcile_all_truth_cases(data_dir):
+    """M3 完成判据：真值库全部记录经三引擎计算后逐模块对账 0 mismatch。
+
+    引擎（:mod:`lcc.engine.overtime` / ``annual_leave`` / ``double_wage``）与真值
+    语义（:mod:`lcc.benchmark.cases`）是**两份独立实现**；逐字段 + 隐含结论全对
+    上才算通过（plan/05 §四.2）。
+    """
+    problems = []
+    checked = 0
+    for case in _all_cases(data_dir):
+        region, year = case["coordinate"]
+        ruleset = _ruleset_for(str(region), int(year), data_dir)
+        parsed = CaseInput.from_dict(case["input_facts"])
+        spec = truth.evaluate(parsed, tuple(_M3_ENGINES), ruleset)
+        actual = {name: fn(parsed, ruleset) for name, fn in _M3_ENGINES.items()}
+        mismatches = truth.compare(parsed, spec, actual, ruleset)
+        checked += 1
+        if mismatches:
+            problems.append((case["case_id"], mismatches[:4]))
+    assert checked == len(_all_cases(data_dir))
+    assert not problems, "三引擎与真值库不一致: {}".format(problems[:3])
+
+
+def test_m3_engines_basis_ids_all_resolvable(data_dir):
+    """三引擎对每条真值记录挂出的依据 id 都必须在条款库中（依据不得悬挂）。"""
+    from lcc.law import load_library
+
+    library = load_library(data_dir)
+    for case in _all_cases(data_dir):
+        region, year = case["coordinate"]
+        ruleset = _ruleset_for(str(region), int(year), data_dir)
+        parsed = CaseInput.from_dict(case["input_facts"])
+        for name, fn in _M3_ENGINES.items():
+            output = fn(parsed, ruleset)
+            missing = [item for item in output["basis"] if not library.has(item)]
+            assert not missing, (case["case_id"], name, missing)
 
 
 # ---- 输入可被模型接受（D-18：文档说的输入必须真能跑） ----------------------

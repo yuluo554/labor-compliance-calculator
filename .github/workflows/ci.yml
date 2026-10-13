@@ -60,5 +60,6 @@ jobs:
           python -m lcc params
           python -m lcc doctor
           python -m lcc calc examples/sample-case.json --modules severance
+          python -m lcc calc examples/sample-case.json
         env:
           PYTHONPATH: code/src

@@ -87,9 +87,8 @@ def test_calc_gate_blocked_returns_input_error(data_dir, tmp_path, capsys):
 def test_calc_verified_coordinate_passes_gate_into_engine(data_dir, tmp_path, capsys):
     """已核对坐标（北京 2025）→ 门控放行进入引擎。
 
-    M2 后：只跑 ``severance`` 模块应成功（exit 0 并给出金额）；跑默认四模块时
-    其余三引擎待 M3 → exit 1（里程碑提示）。两条通路一起断言，防止"门控放行"
-    与"引擎实现"两个事实互相掩盖。
+    M3 后：四模块全部实现，默认四模块与单跑 ``severance`` 都应成功（exit 0 并
+    给出金额）；两条通路一起断言，防止"门控放行"与"引擎实现"两个事实互相掩盖。
     """
     path = tmp_path / "verified.json"
     path.write_text(json.dumps({
@@ -99,18 +98,20 @@ def test_calc_verified_coordinate_passes_gate_into_engine(data_dir, tmp_path, ca
         "termination": {"ground": "mutual_agreement"},
     }), encoding="utf-8")
 
-    # 只跑经济补偿 → M2 已实现，成功出金额
+    # 只跑经济补偿 → 成功出金额
     code = cli.main(["--data-dir", data_dir, "calc", str(path), "--modules", "severance"])
     out = capsys.readouterr().out
     assert code == EXIT_OK
     assert "经济补偿" in out
 
-    # 默认四模块 → 其余三引擎待 M3，exit 1 且提示里程碑
+    # 默认四模块 → M3 全部实现，成功出四模块结论
     code = cli.main(["--data-dir", data_dir, "calc", str(path)])
-    err = capsys.readouterr().err
-    assert code == EXIT_DEGRADED
-    assert "M3" in err
-    assert "未核对" not in err
+    out = capsys.readouterr().out
+    assert code == EXIT_OK
+    assert "经济补偿/赔偿金" in out
+    assert "加班费" in out
+    assert "未休年休假折算" in out
+    assert "未签书面劳动合同二倍工资" in out
 
 
 def test_calc_real_truth_record_passes_gate(data_dir, tmp_path, capsys):

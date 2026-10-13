@@ -53,6 +53,16 @@ def test_b2_boundary_reconciles_all_truth_cases(bench):
     assert result["passed"] == result["total"], result["failures"][:3]
 
 
+def test_b2_covers_all_four_modules(bench):
+    """B2 覆盖面必须含四模块（M3 起 B2 由只跑 severance 扩到四引擎全模块对账）。"""
+    from lcc.benchmark import cases as truth
+
+    assert bench.truth.MODULES == ("severance", "overtime", "annual_leave", "double_wage")
+    # 逐模块调用一次，任一模块缺失即在 _engine_output 处报错
+    result = bench.run_b2()
+    assert result["ok"], result["failures"][:3]
+
+
 def test_b3_interception_is_100_percent(bench):
     result = bench.run_b3()
     assert result["total"] >= 4

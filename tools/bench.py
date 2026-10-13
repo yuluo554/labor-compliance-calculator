@@ -48,7 +48,7 @@ except ImportError:  # 兜底：脱离仓库布局时仍可运行
                         pass
 
 from lcc.benchmark import cases as truth
-from lcc.engine import severance
+from lcc.engine import annual_leave, double_wage, overtime, severance
 from lcc.errors import LccError
 from lcc.gate import effective_ruleset
 from lcc.model import CaseInput, TERMINATION_GROUNDS, TerminationFacts
@@ -138,12 +138,27 @@ def run_b1():
 
 
 # --------------------------------------------------------------------------
-# B2 封顶与取整边界
+# B2 封顶与取整边界（真值库全量 × 全模块对账）
 # --------------------------------------------------------------------------
+
+def _engine_output(case, parsed, ruleset, module):
+    # type: (dict, object, object, str) -> object
+    """按模块调用引擎（severance 需 termination；其余三引擎只需 employment）。"""
+    if module == "severance":
+        return severance.compute(parsed.employment, parsed.termination, ruleset)
+    if module == "overtime":
+        return overtime.compute(parsed.employment, ruleset)
+    if module == "annual_leave":
+        return annual_leave.compute(parsed.employment, ruleset)
+    if module == "double_wage":
+        return double_wage.compute(parsed.employment, ruleset)
+    raise LccError("未知计算模块 {!r}".format(module))
+
 
 def run_b2():
     # type: () -> dict
-    """真值库边界记录经引擎重算后对账（含 cap_band 恰好 ±0.01 与年限取整/12 年上限）。"""
+    """真值库全量记录经四引擎重算后对账（含 cap_band 恰好 ±0.01、年限取整、
+    12 年上限、日历四类倍率、年休假分档与向下取整、二倍工资起算与 11 个月上限）。"""
     get_ruleset = _ruleset_cache()
     total = 0
     passed = 0
@@ -153,16 +168,19 @@ def run_b2():
             region, year = case["coordinate"]
             ruleset = get_ruleset(region, year)
             parsed = CaseInput.from_dict(case["input_facts"])
-            spec = truth.evaluate(parsed, ("severance",), ruleset)
-            output = severance.compute(parsed.employment, parsed.termination, ruleset)
-            mismatches = truth.compare(parsed, spec, {"severance": output}, ruleset)
+            spec = truth.evaluate(parsed, truth.MODULES, ruleset)
+            actual = {
+                name: _engine_output(case, parsed, ruleset, name)
+                for name in truth.MODULES
+            }
+            mismatches = truth.compare(parsed, spec, actual, ruleset)
             total += 1
             if not mismatches:
                 passed += 1
             else:
                 failures.append((case["case_id"], mismatches[:3]))
     return {
-        "name": "B2 封顶与取整边界",
+        "name": "B2 边界与全模块对账",
         "passed": passed,
         "total": total,
         "target": "全通过",

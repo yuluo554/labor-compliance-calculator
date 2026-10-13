@@ -288,7 +288,10 @@ def annual_leave_expected(case, ruleset):
             entitlement = tier["days"]
             break
     if entitlement is None:
-        raise ValueError("累计工作年限 {} 未落入任何年休假分档".format(service))
+        # 累计工作不满最低分档下限（未满 1 年）→ 不享受年休假，应休 0 天
+        # （《职工带薪年休假条例》第三条的享受条件）。真值库不含该区间，
+        # 与 engine/annual_leave.py 同口径，避免出现第二份语义。
+        entitlement = _ZERO
 
     elapsed = (terminate_date - date(terminate_date.year, 1, 1)).days + 1
     prorated = Decimal(elapsed) / ruleset.days_per_year() * entitlement
