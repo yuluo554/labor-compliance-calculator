@@ -61,6 +61,15 @@ $ py -X utf8 tools/bench.py
 - CLI 冒烟：`params` / `doctor` exit 0；`calc --modules severance`（上海 2026）**exit 0 并出金额 79029.17 元**；`calc`（默认四模块）exit 1 报 M3；`calc --preview` exit 1 且不输出金额。
 - 基准全达标（见 §1.4）。
 
+### 1.6 CI（M2 闭环）
+
+- 提交 `af6de10` 已推送 `origin/main`；**CI 全绿**（run `38392116791`）：三矩阵
+  `ubuntu-latest/py3.12` + `windows-latest/py3.12` + `windows-latest/py3.8` 全部 ✓。
+- workflow 步骤：Repo gates（literals / frozen rulesets / **frozen truth** / dessensitize）、
+  **Benchmarks (B1/B2/B3)**、Run tests、CLI smoke（新增 `calc --modules severance` 冒烟）各步均 ✓。
+- 说明：CI 日志仍有 Node.js 20 弃用提示与 ubuntu 镜像迁移预告（actions 版本层面，非本项目失败）。
+- push 事件数 = run 数：本次 push 触发 1 run（对账成立）。
+
 ---
 
 ## 二、M3 待办（下一棒做什么）
