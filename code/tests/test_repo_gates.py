@@ -205,16 +205,37 @@ def test_frozen_json_has_no_cr_and_ends_with_lf(data_dir):
     assert checked > 0
 
 
+def _tracked_text_files(repo_root):
+    # type: (str) -> list
+    """跟踪的文本文件相对路径；无 ``.git``（如 git archive 导出树）时退回文件系统遍历。"""
+    if os.path.isdir(os.path.join(repo_root, ".git")):
+        out = subprocess.check_output(
+            ["git", "-c", "core.quotepath=false", "ls-files"], cwd=repo_root
+        ).decode("utf-8", "replace")
+        return [line.strip() for line in out.splitlines() if line.strip()]
+
+    skip_dirs = {".git", "__pycache__", "node_modules", "build", "dist", ".pytest_cache"}
+    names = []
+    for dirpath, dirnames, filenames in os.walk(repo_root):
+        if "pyvenv.cfg" in filenames:      # venv 特征：整棵剪掉
+            dirnames[:] = []
+            continue
+        dirnames[:] = [
+            name for name in dirnames
+            if name not in skip_dirs and not name.endswith(".egg-info") and not name.startswith(".venv")
+        ]
+        for name in sorted(filenames):
+            rel = os.path.relpath(os.path.join(dirpath, name), repo_root).replace("\\", "/")
+            names.append(rel)
+    return names
+
+
 def test_all_tracked_text_files_use_lf(repo_root):
-    """.gitattributes eol=lf 的守门：跟踪的文本文件工作区副本不得含 CR。"""
-    out = subprocess.check_output(
-        ["git", "-c", "core.quotepath=false", "ls-files"], cwd=repo_root
-    ).decode("utf-8", "replace")
+    """.gitattributes eol=lf 的守门：文本文件工作区副本不得含 CR。"""
     suffixes = (".py", ".md", ".json", ".toml", ".yml", ".yaml", ".txt", ".gitignore", ".gitattributes")
     offenders = []
-    for name in out.splitlines():
-        name = name.strip()
-        if not name or not name.lower().endswith(suffixes):
+    for name in _tracked_text_files(repo_root):
+        if not name.lower().endswith(suffixes):
             continue
         path = os.path.join(repo_root, name)
         if not os.path.isfile(path):
@@ -313,6 +334,51 @@ def test_dessensitize_audit_detects_planted_secret(tmp_path, repo_root):
     categories = {item[2] for item in hard}
     assert "secret_key" in categories
     assert "personal_email" in categories
+
+
+def test_dessensitize_audit_works_without_git(tmp_path, repo_root):
+    """无 ``.git`` 的导出树（git archive）也必须能跑审计——退回文件系统遍历。
+
+    背景：`git archive HEAD | tar -x` 导出的树天然无 .git，若扫描器强依赖 git，
+    干净环境验证会直接崩（而非给出结论）。兜底的排除逻辑按**特征**（pyvenv.cfg）
+    而非目录名，避免把就地建的 venv 当跟踪树扫。
+    """
+    import shutil
+
+    export_root = tmp_path / "export"
+    shutil.copytree(os.path.join(repo_root, "tools"), export_root / "tools")
+    assert not os.path.isdir(os.path.join(str(export_root), ".git"))
+
+    result = subprocess.run(
+        [sys.executable, os.path.join(str(export_root), "tools", "dessensitize_audit.py"),
+         "--mode", "tracked"],
+        cwd=str(export_root), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+    )
+    output = result.stdout.decode("utf-8", "replace")
+    assert result.returncode == 0, output
+    assert "DESSENSITIZE_AUDIT_OK" in output
+
+
+def test_lf_gate_works_without_git(tmp_path, repo_root):
+    """无 ``.git`` 时 LF 守门退回文件系统遍历，且能识别 CR 违规（阳性对照）。"""
+    export_root = tmp_path / "export"
+    (export_root / "sub").mkdir(parents=True)
+    good = export_root / "good.md"
+    bad = export_root / "sub" / "bad.md"
+    good.write_bytes(b"line\n")
+    bad.write_bytes(b"line\r\n")
+
+    names = _tracked_text_files(str(export_root))
+    assert "good.md" in names
+    assert "sub/bad.md" in names
+
+    offenders = []
+    for name in names:
+        path = os.path.join(str(export_root), name)
+        with open(path, "rb") as handle:
+            if b"\r" in handle.read():
+                offenders.append(name)
+    assert offenders == ["sub/bad.md"]
 
 
 def test_dessensitize_audit_ignores_hex_and_reserved_domains(repo_root):

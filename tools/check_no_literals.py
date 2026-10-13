@@ -35,7 +35,25 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "code", "src"))
 
-from lcc._stdio import _ensure_utf8_stdio  # noqa: E402
+try:
+    from lcc._stdio import _ensure_utf8_stdio
+except ImportError:  # 兜底：脱离仓库布局时仍可运行
+    def _ensure_utf8_stdio(stream_names=("stdout", "stderr")):
+        # type: (object) -> None
+        for name in stream_names:
+            stream = getattr(sys, name, None)
+            if stream is None:
+                continue
+            encoding = getattr(stream, "encoding", None) or ""
+            try:
+                "劳动合规".encode(encoding)
+            except (UnicodeEncodeError, LookupError):
+                reconfigure = getattr(stream, "reconfigure", None)
+                if reconfigure is not None:
+                    try:
+                        reconfigure(encoding="utf-8")
+                    except (ValueError, OSError):
+                        pass
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 SRC = os.path.join(ROOT, "code", "src", "lcc")

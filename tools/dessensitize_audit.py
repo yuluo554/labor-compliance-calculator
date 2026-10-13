@@ -30,7 +30,25 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "code", "src"))
 
-from lcc._stdio import _ensure_utf8_stdio  # noqa: E402
+try:
+    from lcc._stdio import _ensure_utf8_stdio
+except ImportError:  # 兜底：脱离仓库布局（如仅复制 tools/）时仍可运行
+    def _ensure_utf8_stdio(stream_names=("stdout", "stderr")):
+        # type: (object) -> None
+        for name in stream_names:
+            stream = getattr(sys, name, None)
+            if stream is None:
+                continue
+            encoding = getattr(stream, "encoding", None) or ""
+            try:
+                "劳动合规".encode(encoding)
+            except (UnicodeEncodeError, LookupError):
+                reconfigure = getattr(stream, "reconfigure", None)
+                if reconfigure is not None:
+                    try:
+                        reconfigure(encoding="utf-8")
+                    except (ValueError, OSError):
+                        pass
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
@@ -72,13 +90,54 @@ WHITELIST_LINE_MARKERS = (
 )
 
 
+def _has_git():
+    # type: () -> bool
+    return os.path.isdir(os.path.join(ROOT, ".git"))
+
+
+def _git(args):
+    # type: (list) -> str
+    return subprocess.check_output(
+        ["git", "-c", "core.quotepath=false"] + args, cwd=ROOT
+    ).decode("utf-8", "replace")
+
+
+def _walk_filesystem_text_files():
+    # type: () -> list
+    """无 git 兜底：按特征剪掉虚拟环境/缓存/构建产物，遍历文件系统。
+
+    排除按**特征**而非名字（``pyvenv.cfg`` 剪 venv、``__pycache__``/``.git`` 剪目录），
+    避免"在导出树里就地建 venv 后把 site-packages 当跟踪树扫"的成片误报。
+    """
+    skip_dirs = {".git", "__pycache__", "node_modules", "build", "dist", ".pytest_cache"}
+    files = []
+    for dirpath, dirnames, filenames in os.walk(ROOT):
+        # venv 特征：目录含 pyvenv.cfg → 整棵剪掉
+        if "pyvenv.cfg" in filenames:
+            dirnames[:] = []
+            continue
+        dirnames[:] = [
+            name for name in dirnames
+            if name not in skip_dirs and not name.endswith(".egg-info") and not name.startswith(".venv")
+        ]
+        for name in sorted(filenames):
+            lower = name.lower()
+            if not (lower.endswith(TEXT_SUFFIXES) or lower in (".gitignore", ".gitattributes")):
+                continue
+            path = os.path.join(dirpath, name)
+            rel = os.path.relpath(path, ROOT).replace("\\", "/")
+            files.append((rel, path))
+    return files
+
+
 def _iter_tracked_text_files():
     # type: () -> list
-    out = subprocess.check_output(
-        ["git", "-c", "core.quotepath=false", "ls-files"], cwd=ROOT
-    ).decode("utf-8", "replace")
+    """跟踪的文本文件清单；无 ``.git`` 时退回文件系统遍历。"""
+    if not _has_git():
+        return _walk_filesystem_text_files()
+
     files = []
-    for name in out.splitlines():
+    for name in _git(["ls-files"]).splitlines():
         name = name.strip()
         if not name:
             continue
@@ -119,20 +178,22 @@ def scan_tracked():
 
 def scan_messages():
     # type: () -> tuple
-    out = subprocess.check_output(
-        ["git", "log", "--all", "--format=%H%x09%B"], cwd=ROOT
-    ).decode("utf-8", "replace")
+    if not _has_git():
+        return [], []
+    out = _git(["log", "--all", "--format=%H%x09%B"])
     return _scan_text(out, "<commit-messages>")
 
 
 def _alive_probe():
     # type: () -> bool
-    """历史通道探活：先搜必然存在的串（仓库名），搜不到即机制失效。"""
+    """历史通道探活：先搜必然存在的串（提交标题），搜不到即机制失效。
+
+    注意：``git log --format=%s -n 5`` 若无输出，说明历史不可读或为空——
+    此时**必须**让扫描失败而非静默返回 0 命中（否则是"全历史干净"的假绿）。
+    """
     try:
-        out = subprocess.check_output(
-            ["git", "log", "--all", "--format=%s", "-n", "5"], cwd=ROOT
-        ).decode("utf-8", "replace")
-    except subprocess.CalledProcessError:
+        out = _git(["log", "--all", "--format=%s", "-n", "5"])
+    except (subprocess.CalledProcessError, OSError):
         return False
     return bool(out.strip())
 
@@ -140,9 +201,9 @@ def _alive_probe():
 def scan_history():
     # type: () -> tuple
     hard, review = [], []
-    revs = subprocess.check_output(
-        ["git", "rev-list", "--all"], cwd=ROOT
-    ).decode("utf-8", "replace").split()
+    if not _has_git():
+        return hard, review
+    revs = _git(["rev-list", "--all"]).split()
     for rev in revs:
         try:
             out = subprocess.check_output(
