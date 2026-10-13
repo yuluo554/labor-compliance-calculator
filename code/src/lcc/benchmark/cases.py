@@ -30,6 +30,8 @@ _HALF = Decimal("0.5")
 _REMAINDER_HALF_MONTH_DAYS = 15
 # 天数/日工资的记录精度（精度约定，非政策数值）
 _DAYS_PLACES = "0.000001"
+# N+1 隐含结论校验容差：金额两位量化的一个分位量级（精度约定，非政策数值）
+_WAGE_QUANTIZE_TOLERANCE = Decimal("0.10")
 
 MODULES = ("severance", "overtime", "annual_leave", "double_wage")
 
@@ -387,10 +389,29 @@ def _pred_none_formula_yields_zero(actual, ruleset):
 
 
 def _pred_n_plus_1_uses_last_month_wage(actual, ruleset):
-    # +1 是上月工资而非封顶后基数：基数被封顶时两者必须不等
-    if not actual.get("cap_applied"):
+    """N+1 的「+1」是**上一个月工资**（D-30），不是封顶/下限后的基数。
+
+    机械校验：从 ``amount`` 中剥离 N 部分（= 实际计算基数 × 年限）后，余量必须
+    等于 ``last_month_wage``。基数优先取引擎报告的 ``basis_wage``，缺失时按口径
+    回退（封顶值 / 最低工资 / 月平均工资）；金额两位量化 → 容差取一个分位量级
+    （仍能捕获 1 元级篡改）。
+
+    历史注记：M1 原实现为「封顶时上月工资必须 > 封顶基数」，与真值自身
+    ``expected.amount`` 矛盾——上月工资恰好等于封顶基数的合法巧合会被误判
+    （实测 1 例）；M2 改为下述等价式判定（见 plan/06 D-39）。
+    """
+    if actual.get("formula") != "N+1":
         return True
-    return Decimal(actual.get("last_month_wage")) > Decimal(actual.get("cap_base"))
+    if actual.get("basis_wage") is not None:
+        basis = Decimal(actual.get("basis_wage"))
+    elif actual.get("cap_applied"):
+        basis = Decimal(actual.get("cap_base"))
+    elif actual.get("min_wage_applied"):
+        basis = ruleset.min_wage_monthly()
+    else:
+        basis = Decimal(actual.get("monthly_wage_avg"))
+    residual = Decimal(actual.get("amount")) - basis * Decimal(actual.get("years_used"))
+    return abs(residual - Decimal(actual.get("last_month_wage"))) <= _WAGE_QUANTIZE_TOLERANCE
 
 
 def _pred_statutory_holiday_uses_holiday_rate(actual, ruleset):

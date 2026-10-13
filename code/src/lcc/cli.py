@@ -205,7 +205,8 @@ def cmd_calc(args):
 
     _print()
     _print(result.disclaimer)
-    return EXIT_OK
+    # 降级语义（plan/03 §六、plan/04 §八）：预览模式不输出金额结论 → exit 1
+    return EXIT_DEGRADED if result.preview else EXIT_OK
 
 
 def cmd_gui(args):

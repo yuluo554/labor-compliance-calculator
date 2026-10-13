@@ -155,6 +155,47 @@ def test_compare_reports_mismatch_on_tampered_value(data_dir):
     assert mismatches, "篡改金额后 compare 未报不一致"
 
 
+# ---- M2-6：经济补偿引擎对全量真值库回归（100% 对账） ---------------------
+
+def test_severance_engine_reconciles_all_truth_cases(data_dir):
+    """M2 完成判据：真值库全部记录经引擎计算后 ``severance`` 对账 0 mismatch。
+
+    引擎（:mod:`lcc.engine.severance`）与真值语义（:mod:`lcc.benchmark.cases`）是
+    **两份独立实现**；逐字段 + 隐含结论全对上才算通过（plan/05 §四.2）。
+    """
+    from lcc.engine import severance
+
+    problems = []
+    checked = 0
+    for case in _all_cases(data_dir):
+        region, year = case["coordinate"]
+        ruleset = _ruleset_for(str(region), int(year), data_dir)
+        parsed = CaseInput.from_dict(case["input_facts"])
+        spec = truth.evaluate(parsed, ("severance",), ruleset)
+        output = severance.compute(parsed.employment, parsed.termination, ruleset)
+        mismatches = truth.compare(parsed, spec, {"severance": output}, ruleset)
+        checked += 1
+        if mismatches:
+            problems.append((case["case_id"], mismatches[:4]))
+    assert checked == len(_all_cases(data_dir))
+    assert not problems, "经济补偿引擎与真值库不一致: {}".format(problems[:3])
+
+
+def test_severance_engine_basis_ids_all_resolvable(data_dir):
+    """引擎对每条真值记录挂出的依据 id 都必须在条款库中（依据不得悬挂）。"""
+    from lcc.engine import severance
+    from lcc.law import load_library
+
+    library = load_library(data_dir)
+    for case in _all_cases(data_dir):
+        region, year = case["coordinate"]
+        ruleset = _ruleset_for(str(region), int(year), data_dir)
+        parsed = CaseInput.from_dict(case["input_facts"])
+        output = severance.compute(parsed.employment, parsed.termination, ruleset)
+        missing = [item for item in output["basis"] if not library.has(item)]
+        assert not missing, (case["case_id"], missing)
+
+
 # ---- 输入可被模型接受（D-18：文档说的输入必须真能跑） ----------------------
 
 def test_every_case_input_facts_parse(data_dir):

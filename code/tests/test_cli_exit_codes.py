@@ -85,23 +85,38 @@ def test_calc_gate_blocked_returns_input_error(data_dir, tmp_path, capsys):
 
 
 def test_calc_verified_coordinate_passes_gate_into_engine(data_dir, tmp_path, capsys):
-    """已核对坐标（北京 2025）→ 门控放行进入引擎；引擎待 M2 → exit 1（M1 完成判据）。"""
+    """已核对坐标（北京 2025）→ 门控放行进入引擎。
+
+    M2 后：只跑 ``severance`` 模块应成功（exit 0 并给出金额）；跑默认四模块时
+    其余三引擎待 M3 → exit 1（里程碑提示）。两条通路一起断言，防止"门控放行"
+    与"引擎实现"两个事实互相掩盖。
+    """
     path = tmp_path / "verified.json"
     path.write_text(json.dumps({
-        "employment": {"region_code": "110000", "year": 2025, "hire_date": "2020-01-01"},
+        "employment": {"region_code": "110000", "year": 2025, "hire_date": "2020-01-01",
+                       "terminate_date": "2025-06-30",
+                       "monthly_wages": ["12000.00"] * 12},
         "termination": {"ground": "mutual_agreement"},
     }), encoding="utf-8")
+
+    # 只跑经济补偿 → M2 已实现，成功出金额
+    code = cli.main(["--data-dir", data_dir, "calc", str(path), "--modules", "severance"])
+    out = capsys.readouterr().out
+    assert code == EXIT_OK
+    assert "经济补偿" in out
+
+    # 默认四模块 → 其余三引擎待 M3，exit 1 且提示里程碑
     code = cli.main(["--data-dir", data_dir, "calc", str(path)])
-    assert code == EXIT_DEGRADED
     err = capsys.readouterr().err
-    assert "M2" in err
+    assert code == EXIT_DEGRADED
+    assert "M3" in err
     assert "未核对" not in err
 
 
 def test_calc_real_truth_record_passes_gate(data_dir, tmp_path, capsys):
-    """M1 完成判据的可执行证据：真值库中的真实记录（已核对坐标）走完整通路。
+    """真值库中的真实记录（已核对坐标）走完整通路：门控放行 + M2 经济补偿可算。
 
-    真值库记录 → 抽出 input_facts 写单条 → 坐标加载 → 门控放行 → 引擎（待 M2，exit 1）。
+    真值库记录 → 抽出 input_facts 写单条 → 坐标加载 → 门控放行 → 经济补偿引擎出金额。
     与 pending 坐标（exit 2）形成对照；证明门控对已核对坐标确实放通。
     """
     truth_path = os.path.join(data_dir, "truth", "cases-boundary.json")
@@ -112,23 +127,43 @@ def test_calc_real_truth_record_passes_gate(data_dir, tmp_path, capsys):
 
     path = tmp_path / "record.json"
     path.write_text(json.dumps(record, ensure_ascii=False), encoding="utf-8")
-    assert cli.main(["--data-dir", data_dir, "calc", str(path)]) == EXIT_DEGRADED
-    err = capsys.readouterr().err
-    assert "M2" in err
-    assert "未核对" not in err
+    code = cli.main(["--data-dir", data_dir, "calc", str(path), "--modules", "severance"])
+    out = capsys.readouterr().out
+    assert code == EXIT_OK
+    assert "经济补偿" in out
+
+
+def test_calc_severance_amount_matches_truth_record(data_dir, tmp_path, capsys):
+    """端到端金额对账：CLI 输出的经济补偿金额 = 真值库该记录 ``expected.severance.amount``。"""
+    truth_path = os.path.join(data_dir, "truth", "cases-boundary.json")
+    with open(truth_path, "r", encoding="utf-8") as handle:
+        record = json.load(handle)["cases"][0]
+    expected_amount = record["expected"]["severance"]["amount"]
+
+    path = tmp_path / "record.json"
+    path.write_text(json.dumps(record, ensure_ascii=False), encoding="utf-8")
+    code = cli.main(["--data-dir", data_dir, "calc", str(path), "--modules", "severance"])
+    out = capsys.readouterr().out
+    assert code == EXIT_OK
+    assert "{} 元".format(expected_amount) in out, out
 
 
 def test_calc_preview_returns_degraded(data_dir, tmp_path, capsys):
-    """预览模式：门控放行取参数，但引擎未实现 → exit 1，且无金额输出。"""
+    """预览模式：门控命中时仅展示参数元信息，**不进入引擎**、不输出金额 → exit 1。
+
+    这是 plan/03 §六 / plan/04 §八 的降级语义（`allow_pending` 通路不得产出金额）。
+    """
     path = tmp_path / "e.json"
     path.write_text(json.dumps({
         "employment": {"region_code": "440000", "year": 2026, "hire_date": "2020-01-01"},
         "termination": {"ground": "mutual_agreement"},
     }), encoding="utf-8")
     code = cli.main(["--data-dir", data_dir, "calc", "--preview", str(path)])
+    out = capsys.readouterr().out
     assert code == EXIT_DEGRADED
-    err = capsys.readouterr().err
-    assert "M2" in err
+    assert "参数来源" in out
+    assert "预览模式" in out
+    assert "经济补偿/赔偿金" not in out, "预览模式不得输出任何金额结论"
 
 
 def test_calc_accepts_truth_record_input(data_dir, tmp_path):

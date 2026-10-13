@@ -121,6 +121,11 @@ def compute_full_calc(request):
 
     basis_ids = []
 
+    if request.preview:
+        # 预览模式：门控命中时仅展示参数元信息，**不进入引擎**（plan/03 §131、
+        # plan/04 §339：allow_pending 通路不得产出任何金额结论）。
+        return result
+
     for name in request.modules:
         if name == "severance":
             if case.termination is None:
