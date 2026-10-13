@@ -83,15 +83,21 @@
 
 | 项 | 值 |
 |---|---|
-| 全历史 push 事件触发 run 数 | **13**（含 M6 发布准备提交 `167fe38` → run `38425953290`） |
+| push 事件触发 run 数 | **16** |
 | 非 push 事件 run 数 | 0（`gh run list --json event` 唯一值 = `push`） |
-| 唯一 head SHA 数 | 13 = run 数 ✅ |
-| 最新 run | `38425953290` @ `167fe38`：三矩阵 `ubuntu/py3.12` + `windows/py3.12` + `windows/py3.8` **全 ✓** |
+| 发布准备提交 | `167fe38` → run `38425953290`：三矩阵 **全 ✓ 225 passed** |
 | 新增步骤实测 | `release_assets.py selftest` → `RELEASE_ASSETS_SELFTEST_OK`；`dessensitize --mode messages`/`--mode history` → 两模式 `DESSENSITIZE_AUDIT_OK`（依赖 `fetch-depth: 0`） |
-| 测试数（CI 实测） | windows/3.12 **225 passed**、windows/3.8 **225 passed**、ubuntu/3.12 **225 passed** |
+| **首推终态提交失败并修复** | `edd9fcd` → run `38427285439` **三矩阵全红**：脱敏门抓到 `RELEASE-M6.md` 自身复述了字面路径形态（HARD `user_home_path`）→ 改为占位符表述，`--amend`（显式带 `GIT_COMMITTER_EMAIL`，防 committer 回落旧值）+ `--force-with-lease` 推送 |
+| 修复后终态提交 | `47415dc` → run `38427732093`（main，三矩阵 **全 ✓**） |
+| **tag 触发的那轮** | `v0.1.0` tag push → run `38428190360`（`head_branch=v0.1.0`，**success**）；`ci.yml` 配了 `tags: ["v*"]`，故 tag push 单独触发一轮 |
+| 测试数（CI 实测） | windows/3.12、windows/3.8、ubuntu/3.12 均 **225 passed** |
 
 > 说明：最早 7 个提交随"建仓首推"一次到达，只在其 tip 产生 1 个 run（D-36 已留档）；
-> 此后每个 push 事件各触发 1 个 run。tag push 会另触发一轮（`ci.yml` 配了 `tags: ["v*"]`）。
+> 此后每个 push 事件各触发 1 个 run。`edd9fcd` 已被 force-push 移出远端，其失败 run 保留在历史记录中
+> （如实留档，不掩盖）。
+>
+> **本轮的教训与"留档不得复述敏感字面值"纪律吻合**：留档文档为解释"扫描器曾漏报"而复述了
+> 字面路径形态 → 脱敏门当场拦下。处置即占位化表述；这也证明脱敏门**真的在 CI 里跑**（不是空验）。
 
 ---
 
@@ -118,7 +124,10 @@
 |---|---|---|
 | 解压到中立目录（仓库树外） | 两个 zip 解压到同一目录 → `lcc-cli/` + `lcc-gui/` | ✅ |
 | 中立目录 + 最小环境自检 | `python tools/verify_package.py --dist <解压目录>` | ✅ `PACKAGE_VERIFY_OK`：CLI 六连全过（`params`/`doctor`/`calc` 单模块/`calc` 四模块/`--preview` exit 1/`report` md + xlsx）+ GUI offscreen 冒烟启动 |
-| 下载件 sha256 与留档一致 | `certutil -hashfile ... SHA256`（见 §五） | ✅ 待 Release 上传后复核（见 §七） |
+| **真下载**发布附件 | `gh release download v0.1.0 --repo yuluo554/labor-compliance-calculator` | ✅ 三个附件全部下载成功（`NO_PROXY="*"` 绕本机代理） |
+| **下载件 sha256 与台账逐位一致** | `sha256sum *.zip` | ✅ `lcc-cli` = `a750cb36…70635c`、`lcc-gui` = `3f521dc3…7b7f67`（与 §五 留档值**逐位相同**） |
+| **下载件解压到中立目录自检** | 解压下载的 zip → `verify_package.py --dist <该目录>` | ✅ `PACKAGE_VERIFY_OK`（与 §六第 2 行同法，对象是**用户实际下载到的那份**） |
+| 版本一致性 | 解压后 `lcc.exe doctor` | ✅ 首行 `劳动用工合规计算引擎 v0.1.0 环境自检`（与 pyproject/`__init__` 一致） |
 
 ---
 
@@ -126,15 +135,23 @@
 
 | 项 | 值 |
 |---|---|
-| tag | `v0.1.0`（annotated，打在含本留档的终态提交上） |
-| Release | ⬜ 见 §八 执行结果回写 |
-| topics | ⬜ 见 §八 |
+| tag | `v0.1.0`（annotated，指向终态提交 `47415dc`） |
+| Release URL | https://github.com/yuluo554/labor-compliance-calculator/releases/tag/v0.1.0 |
+| Release 附件 | `lcc-cli-0.1.0-win64.zip` / `lcc-gui-0.1.0-win64.zip` / `demo.gif` |
+| topics | `annual-leave` `calculator` `cli` `compliance` `employment` `labor-law` `overtime` `pyside6` `python` `severance`（`gh api` 回读确认 10 个生效） |
 
 ---
 
-## 八、发布执行结果（发布后回写）
+## 八、发布执行结果
 
-⬜ 待回写：CI run id、Release URL、下载件 sha256 复核、topics 回读、tag 触发的那轮 run。
+| # | 项 | 结果 |
+|---|---|---|
+| 1 | tag 触发 CI run | `38428190360`（`head_branch=v0.1.0`）**success** |
+| 2 | 终态提交 CI run | `38427732093`（main）**success**，三矩阵全 ✓ |
+| 3 | push 数 = run 数 | 16 push 事件 = 16 run（含 1 个失败后被 force-push 替换的 run，如实留档） |
+| 4 | 下载件 sha256 | 与台账逐位一致（见 §六） |
+| 5 | 中立目录自检 | `PACKAGE_VERIFY_OK`（对象为下载件解压目录） |
+| 6 | topics 回读 | 10 个全部生效 |
 
 ---
 

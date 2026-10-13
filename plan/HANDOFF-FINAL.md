@@ -99,9 +99,19 @@ py -3.12 -X utf8 tools/make_demo_assets.py --out <仓库树外目录>
 
 ---
 
-## 五、发布后复核（待回写）
+## 五、发布后复核（已完成）
 
-⬜ 待回写：Release URL、下载件 sha256 复核结果、topics 回读、tag 触发的那轮 CI run id。
+| # | 项 | 结果 |
+|---|---|---|
+| 1 | tag | `v0.1.0`（annotated）→ 触发 run `38428190360`（`head_branch=v0.1.0`）**success** |
+| 2 | 终态提交 CI | `47415dc` → run `38427732093`（main）**success**，三矩阵全 ✓ **225 passed** |
+| 3 | Release URL | https://github.com/yuluo554/labor-compliance-calculator/releases/tag/v0.1.0 |
+| 4 | 附件 | `lcc-cli-0.1.0-win64.zip`（18,949,021 B）+ `lcc-gui-0.1.0-win64.zip`（60,412,182 B）+ `demo.gif` |
+| 5 | 下载件 sha256 复核 | 与台账**逐位一致**：cli `a750cb36…70635c`、gui `3f521dc3…7b7f67` |
+| 6 | 下载件中立目录自检 | `verify_package.py --dist <解压目录>` → `PACKAGE_VERIFY_OK`；`lcc.exe doctor` 首行 `v0.1.0` |
+| 7 | topics 回读 | 10 个全部生效 |
+| 8 | push 数 = run 数 | 16 push 事件 = 16 run（含 1 个失败后被 force-push 替换的 run，如实留档） |
+| 9 | 一处修复实录 | 终态提交首推 `edd9fcd` 三矩阵全红——脱敏门抓到 `RELEASE-M6.md` 自身复述字面路径形态；占位化后 `--amend`（显式带 `GIT_COMMITTER_EMAIL`）+ `--force-with-lease` → `47415dc` 全绿 |
 
 ---
 

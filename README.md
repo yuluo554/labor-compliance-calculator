@@ -1,6 +1,11 @@
 # 劳动用工合规计算引擎
 
-> 本地目录 `10-13-labor-compliance-calculator`（`10-13` = 2026-10-13 日期标签）。GitHub 仓库名发布时用纯净名 `labor-compliance-calculator`，见 [plan/00-README总览.md](plan/00-README总览.md)。
+[![CI](https://github.com/yuluo554/labor-compliance-calculator/actions/workflows/ci.yml/badge.svg)](https://github.com/yuluo554/labor-compliance-calculator/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/yuluo554/labor-compliance-calculator)](https://github.com/yuluo554/labor-compliance-calculator/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+> **✅ v0.1.0 已发布** —— [下载即用](#下载即用)（Windows 64 位双 exe，免安装）。
+> 本地目录 `10-13-labor-compliance-calculator`（`10-13` = 2026-10-13 日期标签）；GitHub 仓库名用纯净名 `labor-compliance-calculator`，见 [plan/00-README总览.md](plan/00-README总览.md)。
 
 把经济补偿 N/N+1/2N 口径判定、加班费、年休假折算、二倍工资做成**参数化、可溯源、跨年度跨地区不混用**的本地引擎（桌面 exe + CLI）。
 
@@ -22,7 +27,7 @@
 
 ## 下载即用
 
-无需安装 Python —— 从 [Releases](../../releases/latest) 下载打包好的 Windows 64 位版本，解压后直接运行：
+无需安装 Python —— 从 [Releases](https://github.com/yuluo554/labor-compliance-calculator/releases/latest) 下载打包好的 Windows 64 位版本，解压后直接运行：
 
 | 附件 | 内容 |
 |---|---|
