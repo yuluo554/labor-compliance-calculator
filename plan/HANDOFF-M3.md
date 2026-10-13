@@ -63,12 +63,13 @@ $ py -X utf8 tools/bench.py
 
 ### 1.6 CI（M2 闭环）
 
-- 提交 `af6de10` 已推送 `origin/main`；**CI 全绿**（run `38392116791`）：三矩阵
+- 提交 `af6de10`（引擎实现）推送 `origin/main` → **CI 全绿**（run `38392116791`）：三矩阵
   `ubuntu-latest/py3.12` + `windows-latest/py3.12` + `windows-latest/py3.8` 全部 ✓。
+- 提交 `d781fa1`（本回写）再推 → **CI 全绿**（run `38392350209`，三矩阵同样全 ✓）。
 - workflow 步骤：Repo gates（literals / frozen rulesets / **frozen truth** / dessensitize）、
   **Benchmarks (B1/B2/B3)**、Run tests、CLI smoke（新增 `calc --modules severance` 冒烟）各步均 ✓。
 - 说明：CI 日志仍有 Node.js 20 弃用提示与 ubuntu 镜像迁移预告（actions 版本层面，非本项目失败）。
-- push 事件数 = run 数：本次 push 触发 1 run（对账成立）。
+- push 事件数 = run 数：2 次 push = 2 个 run，对账成立（`git rev-list --count` 数的是提交数，勿混用）。
 
 ---
 
