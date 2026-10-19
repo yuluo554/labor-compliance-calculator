@@ -27,7 +27,7 @@ from .engine import double_wage as double_wage_engine
 from .engine import overtime as overtime_engine
 from .engine import severance as severance_engine
 from .errors import LccError, NotImplementedYet
-from .gate import effective_ruleset
+from .gate import effective_ruleset, pending_entries
 from .model import CaseInput
 
 DISCLAIMER = (
@@ -111,8 +111,12 @@ def compute_full_calc(request):
         employment.region_code, employment.year, data_dir=request.data_dir
     )
     constants = params_module.load_constants(data_dir=request.data_dir)
+    # 预览只对"门控命中"生效：没有 pending 项时，幂等的 --preview 不改变计算路径，
+    # 照常进入引擎并产出金额（README §预览 / plan/03 §131 / plan/04 §八）。
+    # 已核对坐标不得传入 allow_pending=True，否则等于绕过门控。
+    preview = bool(request.preview) and bool(pending_entries(ruleset, constants))
     effective = effective_ruleset(
-        ruleset, constants, allow_pending=request.preview, data_dir=request.data_dir
+        ruleset, constants, allow_pending=preview, data_dir=request.data_dir
     )
 
     result = CalcResult(
@@ -120,10 +124,10 @@ def compute_full_calc(request):
         region_name=effective.region_name,
         ruleset_status=ruleset.status,
         case=case,
-        preview=bool(request.preview),
+        preview=preview,
     )
 
-    if request.preview:
+    if preview:
         result.notices.append(
             "预览模式：参数条目存在未核对（pending）项，仅展示参数元信息，不输出任何金额结论。"
         )
@@ -138,7 +142,7 @@ def compute_full_calc(request):
 
     basis_ids = []
 
-    if request.preview:
+    if preview:
         # 预览模式：门控命中时仅展示参数元信息，**不进入引擎**（plan/03 §131、
         # plan/04 §339：allow_pending 通路不得产出任何金额结论）。
         return result

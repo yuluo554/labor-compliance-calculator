@@ -42,12 +42,16 @@
 
 ## 三、发布执行记录
 
+> **v0.1.1 迭代后注记**：Python 下限抬至 3.12（3.8 已 EOL）；测试总数 225 → **229**
+> （`[dev]` 224 passed + 5 skipped）；`--preview` 仅在门控命中时降级。下表为
+> v0.1.0 发布时点记录，保留原值。
+
 | # | 项 | 结论 |
 |---|---|---|
 | 1 | 脱敏四步（tracked / messages / history） | ✅ 三模式 `DESSENSITIZE_AUDIT_OK`，0 硬门 |
 | 2 | 产物本体扫描（全 dist 树字节级） | ✅ 1179 文件 0 命中；`selftest` 阳性+阴性对照通过 |
 | 3 | 提交元数据邮箱（ae/ce 两字段） | ✅ 全历史唯一值 = GitHub noreply，无需改写、无 force-push |
-| 4 | 干净环境（新 clone + 新 venv，README 逐字） | ✅ `[dev]` 209+5skip、`[dev,gui,report]` 225 passed；门禁+基准+GUI 冒烟全过 |
+| 4 | 干净环境（新 clone + 新 venv，README 逐字） | ✅ `[dev]` 220+5skip、`[dev,gui,report]` 225 passed；门禁+基准+GUI 冒烟全过 |
 | 5 | CI 全绿 + push 数 = run 数 | ✅ 13 run / 13 唯一 head SHA / 全 `push` 事件；run `38425953290` 三矩阵全 ✓ |
 | 6 | 附件可复跑打包 + 台账 | ✅ 同 dist 两次打包 sha256 逐字节一致；ledger JSON 留档 |
 | 7 | 发布物本体自检 | ✅ 解压仓库树外 → `verify_package.py --dist` → `PACKAGE_VERIFY_OK` |

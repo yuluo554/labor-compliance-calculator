@@ -4,7 +4,7 @@
 [![Release](https://img.shields.io/github/v/release/yuluo554/labor-compliance-calculator)](https://github.com/yuluo554/labor-compliance-calculator/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> **✅ v0.1.0 已发布** —— [下载即用](#下载即用)（Windows 64 位双 exe，免安装）。
+> **v0.1.1** —— 修正 `--preview` 语义（仅门控命中时降级）、发布产物瘦身（去除 PIL/lxml）、文档数字回写。Windows 64 位双 exe 见 [Releases](https://github.com/yuluo554/labor-compliance-calculator/releases/latest)。
 > 本地目录 `10-13-labor-compliance-calculator`（`10-13` = 2026-10-13 日期标签）；GitHub 仓库名用纯净名 `labor-compliance-calculator`，见 [plan/00-README总览.md](plan/00-README总览.md)。
 
 把经济补偿 N/N+1/2N 口径判定、加班费、年休假折算、二倍工资做成**参数化、可溯源、跨年度跨地区不混用**的本地引擎（桌面 exe + CLI）。
@@ -23,7 +23,7 @@
 | M5 | 桌面交付（PySide6 多页签 + 报告导出 + PyInstaller 双 exe + 技术报告） | ✅ 完成 |
 | M6 | 脱敏发布 GitHub + Release | ✅ 完成 |
 
-> 当前：**M6 发布完成**。北京/上海 × 2025/2026 四个坐标的社平工资、最低工资、法定节假日日历已逐条核对官方原文并置 `status=verified`；法定常数包（21 条）与条款库（17 条）全部 verified；合成雇佣档案真值库 406 条入仓。**四引擎**：经济补偿/赔偿金（N / N+1 / 2N + 三倍封顶 + 12 年上限 + 最低工资下限 + 代通知金）、加班费（日历四类联动 + 三档倍率 + 工时制度）、未休年休假折算（分档 + 当年度折算 + 向下取整 + 冲抵）、未签书面劳动合同二倍工资（起算 + 11 个月上限 + 逐月明细）——406 条真值记录**四模块全部对账 0 mismatch**。基准 **B1~B5 全部达标**（B4/B5 为规则驱动，不依赖真值库样本）。**桌面交付**：PySide6 多页签界面（四类计算 + 参数库 + 报告 + 依据），GUI 层零判定逻辑由 AST 断言守门；报告导出 Markdown + XLSX（同源渲染，含免责声明与参数来源块）；PyInstaller onedir 双 exe 经中立目录 + 最小环境 CLI 五连验证。
+> 当前：**M6 发布完成**。北京/上海 × 2025/2026 四个坐标的社平工资、最低工资、法定节假日日历已逐条核对官方原文并置 `status=verified`；法定常数包（21 条）与条款库（17 条）全部 verified；合成雇佣档案真值库 406 条入仓。**四引擎**：经济补偿/赔偿金（N / N+1 / 2N + 三倍封顶 + 12 年上限 + 最低工资下限 + 代通知金）、加班费（日历四类联动 + 三档倍率 + 工时制度）、未休年休假折算（分档 + 当年度折算 + 向下取整 + 冲抵）、未签书面劳动合同二倍工资（起算 + 11 个月上限 + 逐月明细）——406 条真值记录**四模块全部对账 0 mismatch**。基准 **B1~B5 全部达标**（B4/B5 为规则驱动，不依赖真值库样本）。**桌面交付**：PySide6 多页签界面（四类计算 + 参数库 + 报告 + 依据），GUI 层零判定逻辑由 AST 断言守门；报告导出 Markdown + XLSX（同源渲染，含免责声明与参数来源块）；PyInstaller onedir 双 exe 经中立目录 + 最小环境 CLI 六连验证。
 
 ## 下载即用
 
@@ -31,8 +31,8 @@
 
 | 附件 | 内容 |
 |---|---|
-| `lcc-cli-0.1.0-win64.zip` | 命令行版（`lcc.exe`）：`params` / `doctor` / `calc` / `report` |
-| `lcc-gui-0.1.0-win64.zip` | 桌面版（`lcc-gui.exe`）：四类计算 + 参数库 + 报告 + 依据，共 7 个页签 |
+| `lcc-cli-0.1.1-win64.zip` | 命令行版（`lcc.exe`）：`params` / `doctor` / `calc` / `report` |
+| `lcc-gui-0.1.1-win64.zip` | 桌面版（`lcc-gui.exe`）：四类计算 + 参数库 + 报告 + 依据，共 7 个页签 |
 
 解压后 **保持整个目录完整**（`_internal/` 与 exe 同级，数据与依赖都在里面），不要只复制 exe 单文件。
 
@@ -48,8 +48,8 @@ lcc-gui.exe
 校验下载件完整性（比对 Releases 页面公布的 SHA-256）：
 
 ```bat
-certutil -hashfile lcc-cli-0.1.0-win64.zip SHA256
-certutil -hashfile lcc-gui-0.1.0-win64.zip SHA256
+certutil -hashfile lcc-cli-0.1.1-win64.zip SHA256
+certutil -hashfile lcc-gui-0.1.1-win64.zip SHA256
 ```
 
 > 打包产物由 `tools/release_assets.py` 生成：附件名 ASCII、固定时间戳 → 同一份 `dist/`
@@ -108,8 +108,9 @@ python -m lcc calc examples/sample-case.json --modules severance
 # 未核对坐标（广东 440000 仍 pending）→ 门控拒绝（预期 exit 2，提示"未核对"）
 python -m lcc calc examples/sample-case.json   # 把 region_code 改成 440000 复现
 
-# 预览模式：门控命中时仅展示参数元信息，不进入引擎、不输出金额（预期 exit 1）
-python -m lcc calc --preview examples/sample-case.json
+# 预览模式：只在门控命中时降级——未核对坐标仅展示参数元信息、不输出金额（预期 exit 1）
+# 已核对坐标带 --preview 照常出金额（exit 0），与不带 --preview 一致
+python -m lcc calc --preview examples/sample-case.json   # 上海 2026 已核对 → exit 0
 ```
 
 > 默认四模块全跑即得四引擎结论；`--modules` 可只跑指定模块。
@@ -152,8 +153,8 @@ py -3.12 -X utf8 tools/build_release.py            # 构建两个 exe 并自动�
 ```
 
 产物：`dist/lcc-cli/lcc.exe`（控制台）与 `dist/lcc-gui/lcc-gui.exe`（窗口）。
-验证方式是把 onedir 目录复制到**中立目录**、用**最小环境**跑 CLI 五连
-（`--preview` 期望 exit 1），详见 `tools/verify_package.py`。
+验证方式是把 onedir 目录复制到**中立目录**、用**最小环境**跑 CLI 六连
+（`--preview` 已核对坐标期望 exit 0、门控命中期望 exit 1），详见 `tools/verify_package.py`。
 
 ## 目录结构
 
@@ -204,11 +205,11 @@ docs/           技术报告（技术报告.md）与演示素材（demo/）
 | 编排一致性 | CLI 输出 = pipeline 直调 = 报告章节，同一输入逐字段一致 | ✅ `code/tests/test_pipeline_orchestration.py` |
 | 报告两格式一致 | Markdown 与 XLSX 消费同一章节结构（单一渲染源） | ✅ `test_xlsx_report_matches_markdown_content` |
 | 导出可复现 | 同一输入两次导出 XLSX **逐字节一致**（归一化 openpyxl 写盘时间戳与 zip 元数据） | ✅ `test_xlsx_export_is_byte_reproducible` |
-| 双 exe 中立目录验证 | 复制到临时中立目录 + 最小环境跑 **CLI 五连 + 报告导出**（含 `--preview` exit 1） | ✅ `tools/verify_package.py` → `PACKAGE_VERIFY_OK` |
+| 双 exe 中立目录验证 | 复制到临时中立目录 + 最小环境跑 **CLI 六连 + 报告导出**（含 `--preview` 已核对 0 / 门控命中 1） | ✅ `tools/verify_package.py` → `PACKAGE_VERIFY_OK` |
 | datas 白名单单一源 | 两个 spec 均调 `lcc.packaging.build_datas()`，不内联清单 | ✅ `code/tests/test_packaging.py` |
 | 演示素材可复现 | 两次独立生成的 9 个文件 sha256 全部一致 | ✅ `tools/make_demo_assets.py` |
 
-**测试规模**：225 个用例（Python 3.8.8 与 3.12.10 双解释器均实跑全通过；3.8 本机全量单次偶发退出期 segfault，按既定做法分批逐文件确认）。
+**测试规模**：229 个用例（Python 3.12.10 实跑全通过；Python 下限 3.12，3.8 已 EOL）。
 
 技术报告（架构 / 口径判定规则化 / 参数库版本化 / 基准体系 / 桌面交付 / 验证体系）见
 [`docs/技术报告.md`](docs/技术报告.md)。
@@ -232,7 +233,7 @@ docs/           技术报告（技术报告.md）与演示素材（demo/）
 | offscreen 下截图/界面中文显示为方块（豆腐块） | Qt 6 起不再随附字体，且 offscreen 平台不扫描系统字体目录 → 需显式 `QFontDatabase.addApplicationFont(...)` 加载 CJK 字体（Windows 优先 `msyh.ttc`）。CI Linux 还需装 `libegl1 libxkbcommon-x11-0 libxcb-cursor0`。 |
 | 解压后只复制 exe 单文件 → 报缺数据/缺 DLL | PyInstaller **onedir** 产物：`_internal/` 必须与 exe 同目录，**整目录保持完整**。 |
 | `py -m pip install ...` 装到了系统 Python（venv 内没有） | Windows 的 `py` 启动器**绕过 venv** → venv 段落一律用 `python -m pip ...`（激活后 `python` 才指向 venv）。 |
-| 导出 XLSX 报缺 `openpyxl`（exit 1） | XLSX 是可选能力：源码态装 `./code[report]`；官方 Release 的 exe 已内嵌 openpyxl。缺失时**明确提示并降级**，不崩溃。 |
+| 导出 XLSX 报缺 `openpyxl`（exit 1） | XLSX 是可选能力：源码态装 `./code[report]`；官方 Release 的 exe 已把 openpyxl 收进 PyInstaller 归档（PYZ），不出现在 `_internal/` 顶层目录。缺失时**明确提示并降级**，不崩溃。 |
 | 冻结 exe 输出中文在部分终端乱码 | exe 的输出编码随环境变（本机 cp936 → GBK；CI cp1252 管道 → UTF-8）；入口 `_ensure_utf8_stdio()` 按编码探针决定是否转 UTF-8。读 exe 输出时按 UTF-8 → locale 依次尝试解码。 |
 | `pytest` 全绿但退出码 139 | 本机 3.8 的偶发退出期 segfault（与用例无关）→ 清 `__pycache__` 重跑；仍不稳则**分批逐文件**跑。 |
 | GUI 测试被静默跳过 | 未装 PySide6/openpyxl 时相关用例跳过（非失败）→ 要真跑请装 `./code[dev,gui,report]` 并设 `QT_QPA_PLATFORM=offscreen`（CI 即如此配置）。 |

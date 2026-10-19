@@ -19,6 +19,7 @@ output/
 reports/
 .ci-report/
 .scratch/
+_backups/
 *.log
 
 # 环境与密钥

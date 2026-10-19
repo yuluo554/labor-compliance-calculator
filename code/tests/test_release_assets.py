@@ -115,9 +115,21 @@ def test_ledger_matches_disk_hashes(assets, tmp_path):
         assert entry["sha256"] == hashlib.sha256(blob).hexdigest()
 
 
+def test_ledger_missing_attachments_gives_guidance(assets, tmp_path, capsys):
+    """附件目录为空时给出可操作提示（不是裸 traceback）。"""
+    code = assets.main(["ledger", "--out", str(tmp_path / "missing")])
+    assert code == 2
+    err = capsys.readouterr().err
+    assert "未找到附件" in err
+    assert "pack" in err
+    assert "Traceback" not in err
+
+
 def test_artifact_names_match_readme(assets, repo_root):
     """README「下载即用」节引用的附件名必须与工具产出名逐字一致。"""
+    from lcc import __version__
+
     readme = open(os.path.join(repo_root, "README.md"), encoding="utf-8").read()
     for _source_name, pattern in assets.ARTIFACTS:
-        name = pattern.format(version="0.1.0")
+        name = pattern.format(version=__version__)
         assert name in readme, "README 未引用附件名 {}".format(name)

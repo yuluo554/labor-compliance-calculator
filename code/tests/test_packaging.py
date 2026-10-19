@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import os
+import re
 import sys
 
 import pytest
@@ -69,6 +70,24 @@ def test_specs_share_single_datas_source():
         assert "lcc.packaging" in text
         # 不得出现手写的数据目录字面量清单
         assert "data/rules" not in text, "{} 不得内联数据文件清单".format(relative)
+
+
+def test_specs_exclude_pil_and_lxml():
+    """两个 spec 必须排除 PIL / lxml（openpyxl 的可选图像/XML 依赖，约 17 MB）。
+
+    XLSX 写出路径只用 stdlib；排除后仍需实测导出成功（见 verify_package）。
+    """
+    for relative in ("tools/lcc-cli.spec", "tools/lcc-gui.spec"):
+        text = _read(relative)
+        match = re.search(r"excludes=\[([^\]]*)\]", text)
+        assert match, "{} 缺少 excludes 列表".format(relative)
+        excluded = {
+            item.strip().strip('"').strip("'")
+            for item in match.group(1).split(",")
+            if item.strip()
+        }
+        assert "PIL" in excluded, "{} 未排除 PIL".format(relative)
+        assert "lxml" in excluded, "{} 未排除 lxml".format(relative)
 
 
 def test_specs_are_tracked_despite_gitignore():

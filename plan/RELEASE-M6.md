@@ -64,7 +64,7 @@
 | 门控拒绝 | 改 `input_facts.employment.region_code=440000` 后 `calc` | ✅ exit 2（3 个 pending 条目被拒） |
 | 报告 Markdown | `python -m lcc report ... --output report.md` | ✅ exit 0，9204 字节 |
 | 报告 XLSX | 装 `[report]` 后同上 `.xlsx` | ✅ exit 0，14008 字节 |
-| 全量测试（`[dev]`） | `python -m pytest code/tests -q -rs` | ✅ **209 passed + 5 skipped**（跳过项 = 2 XLSX + 3 GUI，可选依赖缺席的声明式跳过） |
+| 全量测试（`[dev]`） | `python -m pytest code/tests -q -rs` | ✅ **220 passed + 5 skipped**（跳过项 = 2 XLSX + 3 GUI，可选依赖缺席的声明式跳过；收集 225） |
 | 全量测试（`[dev,gui,report]` + offscreen） | 同上 | ✅ **225 passed**（无跳过） |
 | 收集数对账 | `pytest --collect-only -q` | ✅ `[dev]` 与装齐 extras **均收集 214→225 条**（GUI 用例是**函数级**跳过，不抹掉收集面） |
 | 门禁五连 | `check_no_literals` / `gen_rulesets --check` / `gen_cases --check` / `dessensitize --mode tracked` / `release_assets selftest` | ✅ 全 OK |
@@ -74,8 +74,13 @@
 | 工作区 | `git status --short` | ✅ 干净（无被验证动作污染） |
 
 > **`[dev]` vs `[dev,gui,report]` 两条通路分别跑**：README 快速开始只装 `[dev]`，
-> GUI/报告章节另装 `[gui]`/`[report]` → 两条都对账（209+5 / 225），
+> GUI/报告章节另装 `[gui]`/`[report]` → 两条都对账（220+5 / 225），
 > 差异**逐项指认**到声明式跳过，不是"双绿但悄悄少跑"。
+>
+> **历史留档说明**：本节数值为 **v0.1.0 发布时点记录**。v0.1.1 起 `--preview`
+> 仅在门控命中时降级（已核对坐标照常出金额、exit 0），测试数增至 229（`[dev]`
+> 为 224 passed + 5 skipped）。后续复测值见 `plan/HANDOFF-FINAL.md` 与
+> `docs/技术报告.md`。
 
 ---
 

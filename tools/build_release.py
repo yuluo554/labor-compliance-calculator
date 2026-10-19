@@ -48,6 +48,9 @@ SPECS = {
     "gui": "tools/lcc-gui.spec",
 }
 
+# openpyxl 的可选图像/XML 依赖（约 17 MB）；XLSX 写出路径只用 stdlib，spec 已排除。
+FORBIDDEN_BUNDLE_DIRS = ("PIL", "lxml")
+
 
 def _log(message):
     # type: (str) -> None
@@ -92,6 +95,27 @@ def verify():
     return subprocess.run(argv, cwd=ROOT).returncode
 
 
+def check_bundle_layout():
+    # type: () -> bool
+    """构建后断言：dist 内不得出现 PIL/ 或 lxml/ 目录（spec excludes 的兜底守门）。"""
+    hits = []
+    for name in ("lcc-cli", "lcc-gui"):
+        root = os.path.join(ROOT, "dist", name)
+        if not os.path.isdir(root):
+            continue
+        for current, dirs, _files in os.walk(root):
+            for dirname in dirs:
+                if dirname in FORBIDDEN_BUNDLE_DIRS:
+                    hits.append(os.path.relpath(os.path.join(current, dirname), ROOT))
+    if hits:
+        sys.stderr.write("\n产物检查失败：不应出现的依赖目录:\n")
+        for hit in hits:
+            sys.stderr.write("  {}\n".format(hit))
+        return False
+    _log("\n产物检查：无 PIL/ 或 lxml/ 目录。")
+    return True
+
+
 def main(argv=None):
     # type: (object) -> int
     _ensure_utf8_stdio()
@@ -110,6 +134,9 @@ def main(argv=None):
         if code != 0:
             sys.stderr.write("\n构建 {} 失败（exit {}）\n".format(target, code))
             return 1
+
+    if not check_bundle_layout():
+        return 1
 
     if args.no_verify:
         _log("\n构建完成（已跳过验证）。")

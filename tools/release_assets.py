@@ -329,7 +329,15 @@ def main(argv=None):
         sys.stdout.write("RELEASE_PACK_OK\n")
         return 0
 
-    entries = ledger(out_dir)
+    try:
+        entries = ledger(out_dir)
+    except FileNotFoundError as exc:
+        sys.stderr.write("{}\n".format(exc))
+        sys.stderr.write(
+            "提示：先运行 `tools/release_assets.py pack --out {}` 生成附件，再重跑 ledger。\n".format(
+                out_dir)
+        )
+        return 2
     sys.stdout.write(json.dumps(entries, ensure_ascii=False, indent=2) + "\n")
     return 0
 

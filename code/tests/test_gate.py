@@ -146,6 +146,44 @@ def test_gate_passes_when_all_verified(tmp_path):
     assert len(effective.entitlement_tiers()) == 3
 
 
+def test_preview_only_relaxes_gate_when_pending(data_dir, monkeypatch):
+    """``--preview`` 只在门控命中（确有 pending 项）时放宽；已核对坐标不放宽。
+
+    这是 D1 的规格：已核对坐标 + preview 必须 ``allow_pending is False``
+    并照常进入引擎（否则等于借预览绕过门控）。
+    """
+    from lcc import pipeline
+
+    captured = {}
+    real_effective = gate.effective_ruleset
+
+    def spy(ruleset, constants=None, allow_pending=False, data_dir=None):
+        captured["allow_pending"] = allow_pending
+        return real_effective(
+            ruleset, constants, allow_pending=allow_pending, data_dir=data_dir
+        )
+
+    monkeypatch.setattr(pipeline, "effective_ruleset", spy)
+
+    verified = pipeline.build_case({
+        "employment": {"region_code": "310000", "year": 2026, "hire_date": "2020-01-01"},
+    })
+    result = pipeline.compute_full_calc(
+        pipeline.build_request(verified, modules=(), data_dir=data_dir, preview=True)
+    )
+    assert captured["allow_pending"] is False
+    assert result.preview is False
+
+    pending = pipeline.build_case({
+        "employment": {"region_code": "440000", "year": 2026, "hire_date": "2020-01-01"},
+    })
+    result = pipeline.compute_full_calc(
+        pipeline.build_request(pending, modules=(), data_dir=data_dir, preview=True)
+    )
+    assert captured["allow_pending"] is True
+    assert result.preview is True
+
+
 def test_engine_takes_effective_ruleset_only():
     """引擎签名不得接受裸 dict（结构性防线，AST/签名断言）。"""
     import inspect

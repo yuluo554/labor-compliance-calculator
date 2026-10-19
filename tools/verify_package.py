@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""打包产物验证（M5-5）：中立目录 + 剥离环境的 CLI 五连 + GUI offscreen 冒烟。
+"""打包产物验证（M5-5）：中立目录 + 剥离环境的 CLI 六连 + GUI offscreen 冒烟。
 
 为什么必须**中立目录 + ``env -i``**：
   * 在仓库根跑 exe 会因 `data/` 回溯命中源码树而"假绿"——真正要验的是**打包物
@@ -10,9 +10,10 @@
 
 本脚本：
   1. 把 ``dist/lcc-cli`` 与 ``dist/lcc-gui`` 复制到临时中立目录（``tempfile``）；
-  2. 用**最小环境**（只保留 Windows 必需的 ``SystemRoot`` 等）跑 CLI 五连
-     （``params`` / ``doctor`` / ``calc`` 单模块 / ``calc`` 默认四模块 / ``calc --preview``）；
-  3. 断言退出码语义（0/0/0/0/1）与关键输出；
+  2. 用**最小环境**（只保留 Windows 必需的 ``SystemRoot`` 等）跑 CLI 六连
+     （``params`` / ``doctor`` / ``calc`` 单模块 / ``calc`` 默认四模块 /
+     ``calc --preview`` 已核对坐标 / ``calc --preview`` 门控命中）；
+  3. 断言退出码语义（0/0/0/0/0/1）与关键输出；
   4. GUI exe 以 offscreen 启动并在短延时后退出（窗口态无 stdout，故只验"能起来"）。
 
 用法：
@@ -23,6 +24,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import locale
 import os
 import shutil
@@ -123,7 +125,7 @@ def _exe(directory, stem):
 
 def verify_cli(work_root):
     # type: (str) -> list
-    """CLI 五连（中立目录 + 最小环境）。返回 ``[(命令, 退出码, 是否通过)]``。"""
+    """CLI 六连（中立目录 + 最小环境）。返回 ``[(命令, 退出码, 是否通过)]``。"""
     cli_dir = _exe(os.path.join(work_root, "lcc-cli"), "lcc")
     sample = os.path.join(ROOT, "examples", "sample-case.json")
     checks = []
@@ -143,8 +145,24 @@ def verify_cli(work_root):
     )
     checks.append(("calc（默认四模块）", code, ok))
 
+    # --preview：已核对坐标不降级（exit 0 出金额）；门控命中才降级（exit 1 仅参数）
     code, out = _run([cli_dir, "calc", "--preview", sample], work_root)
-    checks.append(("calc --preview", code, code == 1 and "预览模式" in out))
+    checks.append((
+        "calc --preview（已核对坐标）", code,
+        code == 0 and "元" in out and "未核对" not in out,
+    ))
+
+    with open(sample, "r", encoding="utf-8") as handle:
+        pending_payload = json.load(handle)
+    pending_payload["input_facts"]["employment"]["region_code"] = "440000"
+    pending_sample = os.path.join(work_root, "verify-pending.json")
+    with open(pending_sample, "w", encoding="utf-8") as handle:
+        json.dump(pending_payload, handle, ensure_ascii=False, indent=2)
+    code, out = _run([cli_dir, "calc", "--preview", pending_sample], work_root)
+    checks.append((
+        "calc --preview（门控命中）", code,
+        code == 1 and "预览模式" in out and "未核对" in out,
+    ))
 
     # 报告导出（Markdown 必过；XLSX 视打包时是否含 openpyxl 而定，缺失应优雅降级）
     md_path = os.path.join(work_root, "verify-report.md")
@@ -227,7 +245,7 @@ def main(argv=None):
             sys.stderr.write("{}\n".format(exc))
             return 2
 
-        sys.stdout.write("\n== CLI 五连（最小环境）==\n")
+        sys.stdout.write("\n== CLI 六连（最小环境）==\n")
         for name, code, ok in verify_cli(work_root):
             sys.stdout.write("[{}] {}（exit {}）\n".format("OK" if ok else "FAIL", name, code))
             if not ok:

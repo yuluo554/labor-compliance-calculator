@@ -164,21 +164,50 @@ def test_calc_preview_returns_degraded(data_dir, tmp_path, capsys):
     assert code == EXIT_DEGRADED
     assert "参数来源" in out
     assert "预览模式" in out
+    assert "未核对" in out
     assert "经济补偿/赔偿金" not in out, "预览模式不得输出任何金额结论"
 
 
+def test_calc_verified_coordinate_preview_computes_normally(data_dir, tmp_path, capsys):
+    """已核对坐标 + ``--preview``：预览只对门控命中生效，此处照常出金额 → exit 0。
+
+    与 pending 坐标的 exit 1 形成对照，锁定「预览不是任意坐标的降级开关」。
+    """
+    path = tmp_path / "verified-preview.json"
+    path.write_text(json.dumps({
+        "employment": {"region_code": "310000", "year": 2026, "hire_date": "2020-01-01",
+                       "terminate_date": "2025-06-30",
+                       "monthly_wages": ["12000.00"] * 12},
+        "termination": {"ground": "mutual_agreement"},
+    }), encoding="utf-8")
+    code = cli.main([
+        "--data-dir", data_dir, "calc", "--preview", str(path), "--modules", "severance",
+    ])
+    out = capsys.readouterr().out
+    assert code == EXIT_OK
+    assert "经济补偿/赔偿金" in out
+    assert "元" in out
+    assert "未核对" not in out
+    assert "预览模式" not in out, "已核对坐标不应打印 pending 预览说明"
+
+
 def test_calc_accepts_truth_record_input(data_dir, tmp_path):
-    """数据文件 ≠ 命令输入：带 input_facts 包装的真值记录要能直接喂。"""
+    """数据文件 ≠ 命令输入：带 input_facts 包装的真值记录要能直接喂。
+
+    已核对坐标（310000/2026）带 ``--preview`` 也不降级 → exit 0。
+    """
     path = tmp_path / "record.json"
     path.write_text(json.dumps({
         "case_id": "demo-001",
         "input_facts": {
-            "employment": {"region_code": "310000", "year": 2026, "hire_date": "2020-01-01"},
+            "employment": {"region_code": "310000", "year": 2026, "hire_date": "2020-01-01",
+                           "terminate_date": "2025-06-30",
+                           "monthly_wages": ["12000.00"] * 12},
             "termination": {"ground": "mutual_agreement"},
         },
         "expected": {"formula": "N"},
     }), encoding="utf-8")
-    assert cli.main(["--data-dir", data_dir, "calc", "--preview", str(path)]) == EXIT_DEGRADED
+    assert cli.main(["--data-dir", data_dir, "calc", "--preview", str(path)]) == EXIT_OK
 
 
 def test_gui_without_pyside_returns_input_error(data_dir, capsys, monkeypatch):

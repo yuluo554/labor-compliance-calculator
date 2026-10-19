@@ -4,6 +4,6 @@
 包结构：errors/decimalutil/data_paths/params/gate/law/model/pipeline/engine/cli/report/gui。
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = ["__version__"]
